@@ -9,7 +9,7 @@
 <script>
 // @ is an alias to /src
 import HelloWorld from '@/components/HelloWorld.vue'
-import axios from 'axios'
+import {cityGuess} from "../api/getData";
 
 export default {
     name: 'home',
@@ -22,7 +22,9 @@ export default {
       HelloWorld
     },
     async mounted() {
-        var res = await axios.get('/api');
+        // var res = await axios.get('/api');
+        // this.msg = res.data;
+        let res = await cityGuess();
         this.msg = res.data;
     }
 }
