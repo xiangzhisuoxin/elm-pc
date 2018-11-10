@@ -1,0 +1,106 @@
+$blue: rgb(0,141,225);
+$bc: #e4e4e4;
+$fc:#fff;
+
+// 宽高
+@mixin wh($width:100%, $height:100%){
+	width: $width;
+	height: $height;
+}
+// 背景图片地址和大小
+@mixin bis($url) {
+	background-image: url($url);
+	background-repeat: no-repeat;
+	background-size: 100% 100%;
+}
+// 盒模型阴影box-shadow
+@mixin shadow($x, $y, $blur, $color){
+	-webkit-box-shadow: $x $y $blur $color;
+	-moz-box-shadow: $x $y $blur $color;
+	box-shadow: $x $y $blur $color;
+}
+// 盒类型box-sizing
+@mixin box-sizing($type:border-box) {
+	-webkit-box-sizing: $type;
+	-moz-box-sizing: $type;
+	box-sizing: $type;
+}
+// 渐变  不能输入三个或多个颜色
+@mixin linear-gradient($from, $to) {
+	/* Fallback for sad browsers */
+	background-color: $to;
+	/* Mozilla Firefox */
+	background-image:-moz-linear-gradient($from, $to);
+	/* Opera */
+	background-image:-o-linear-gradient($from, $to);
+	/* WebKit (Safari 4+, Chrome 1+) */
+	background-image:-webkit-gradient(linear, left top, left bottom, color-stop(0, $from), color-stop(1, $to));
+	/* WebKit (Chrome 11+) */
+	background-image: -webkit-linear-gradient($from, $to);
+	/* IE10 */
+	background-image: -ms-linear-gradient($from, $to);
+	/* W3C */
+	background-image: linear-gradient($from, $to);
+}
+// 边角
+@mixin borderRadius($radius) {
+	-webkit-border-radius: $radius;
+	-moz-border-radius: $radius;
+	-ms-border-radius: $radius;
+	-o-border-radius: $radius;
+	border-radius: $radius;
+}
+
+//定位全屏
+@mixin allcover{
+	position:absolute;
+	top:0;
+	right:0;
+	@include wh;
+}
+
+//定位上下左右居中
+@mixin center {
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	transform: translate(-50%, -50%);
+}
+
+//定位上下居中
+@mixin ct {
+	position: absolute;
+	top: 50%;
+	transform: translateY(-50%);
+}
+
+//定位左右居中
+@mixin cl {
+	position: absolute;
+	left: 50%;
+	transform: translateX(-50%);
+}
+
+
+//字体大小、行高、字体
+@mixin font($size, $line-height, $family: 'Microsoft YaHei') {
+	font: #{$size}/#{$line-height} $family;
+}
+
+//字体大小，颜色
+@mixin sc($size, $color){
+	font-size: $size;
+	color: $color;
+}
+
+//flex 布局和 子元素 对其方式
+@mixin fj($type: space-between){
+	display: flex;
+	justify-content: $type;
+}
+
+//flex 居中
+@mixin marAuto{
+	margin-left: auto;
+	margin-right: auto;
+}
