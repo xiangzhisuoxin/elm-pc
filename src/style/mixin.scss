@@ -1,6 +1,7 @@
-$blue: rgb(0,141,225);
-$bc: #e4e4e4;
-$fc:#fff;
+@charset "utf-8";
+$main-blue: rgb(0,141,225);
+$gray: #eee;
+$highlight: #0089dc;
 
 // 宽高
 @mixin wh($width:100%, $height:100%){
@@ -94,13 +95,47 @@ $fc:#fff;
 }
 
 //flex 布局和 子元素 对其方式
-@mixin fj($type: space-between){
+@mixin fj($type: space-between,$align:stretch){
 	display: flex;
 	justify-content: $type;
+	align-items: $align;
 }
 
-//flex 居中
+// 居中
 @mixin marAuto{
 	margin-left: auto;
 	margin-right: auto;
+}
+
+//span 字体高度
+@mixin fontHei($num){
+	height: $num;
+	line-height: $num;
+}
+
+//浏览器滚动条
+@mixin scrollbar($width,$track,$thumb){
+	/*定义滚动条高宽及背景 高宽分别对应横竖滚动条的尺寸*/
+	::-webkit-scrollbar
+	{
+		width: $width;
+		height: 0px;
+		background-color: #fff;
+	}
+
+	/*定义滚动条轨道 内阴影+圆角*/
+	::-webkit-scrollbar-track
+	{
+		-webkit-box-shadow: inset 0 0 1px rgba(0,0,0,0);
+		border-radius: 10px;
+		background-color: $track;
+	}
+
+	/*定义滑块 内阴影+圆角*/
+	::-webkit-scrollbar-thumb
+	{
+		border-radius: 10px;
+		-webkit-box-shadow: inset 0 0 6px rgba(0,0,0,.3);
+		background-color: $thumb;
+	}
 }
