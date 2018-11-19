@@ -27,7 +27,7 @@
             let res = await getVerificationCode();
             this.verificationCode = res.data.code;
 
-            res = await accountLogin('1', '2', '3');
+            res = await accountLogin('1', '1', '3');
             console.log(res);
 
         }
