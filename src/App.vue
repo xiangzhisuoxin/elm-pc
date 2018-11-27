@@ -9,7 +9,6 @@
 </template>
 
 <style lang="scss">
-  @import "./style/common";
   @import "./style/mixin";
 #app {
   /*font-family: 'Avenir', Helvetica, Arial, sans-serif;*/
