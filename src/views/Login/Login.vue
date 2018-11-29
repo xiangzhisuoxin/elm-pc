@@ -10,7 +10,7 @@
                 <el-input class="pwd" v-model="password" type="password" placeholder="请输入密码"></el-input>
                 <div class="verification">
                     <el-input class="code-input" v-model="verification" placeholder="请输入验证码"></el-input>
-                    <img class="code-img" :src="verificationCode" alt="">
+                    <img class="code-img" @click="getVerfication" :src="verificationCode" alt="">
                 </div>
                 <el-button class="login-btn" type="success" @click="login">登录</el-button>
             </form>
@@ -44,25 +44,42 @@
             Loading,
         },
         async mounted(){
-            let res = await getVerificationCode();
-            this.verificationCode = res.data.code;
+            this.getVerfication()
         },
         methods: {
             ...mapMutations([
                 'RECORD_USERINFO'
             ]),
             async login(type = 'accountLogin'){
-                switch (type) {
+                /*switch (type) {
                     case 'accountLogin':
                         let res = await accountLogin(this.username,this.password,this.verification);
                         this.RECORD_USERINFO(res.data);
                         console.log(res.data);
                         break;
-                }
+                }*/
+                this.isLoading = true;
                 let res = await accountLogin(this.username,this.password,this.verification);
-                this.RECORD_USERINFO(res.data);
-                console.log(res.data);
+                this.isLoading = false;
+                const status = res.data.status;
+                switch (status) {
+                    case 1:
+                        alert('登录成功');
+                        break;
+                        // this.RECORD_USERINFO(res.data);
+                        console.log(res.data);
+                    case 2:
+                        alert('验证码错误');
+                        break;
+                    case 3:
+                        alert('密码错误');
+                        break;
+                }
             },
+            async getVerfication(){
+                let res = await getVerificationCode();
+                this.verificationCode = res.data.code;
+            }
         }
     }
 </script>
@@ -94,6 +111,8 @@
                     }
                     .code-img{
                         flex: 2;
+                        border:1px solid #eee;
+                        cursor: pointer;
                     }
                 }
                 .login-btn{
