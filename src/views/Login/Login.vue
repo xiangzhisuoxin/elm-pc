@@ -12,7 +12,7 @@
                     <el-input class="code-input" v-model="verification" placeholder="请输入验证码"></el-input>
                     <img class="code-img" :src="verificationCode" alt="">
                 </div>
-                <el-button class="login-btn" type="success" @click="login">登录</el-button>
+                <el-button class="login-btn" type="success" @click="login('accountLogin')">登录</el-button>
             </form>
         </main>
         <footer>
@@ -26,7 +26,6 @@
 <script>
     import Loading from '../../components/Loading'
     import {mapMutations} from 'vuex'
-
     import {getVerificationCode, accountLogin} from "../../api/getData";
 
     export default {
@@ -46,22 +45,38 @@
         async mounted(){
             let res = await getVerificationCode();
             this.verificationCode = res.data.code;
+
         },
         methods: {
             ...mapMutations([
                 'RECORD_USERINFO'
             ]),
             async login(type = 'accountLogin'){
+                console.log(type);
                 switch (type) {
                     case 'accountLogin':
+                        this.isLoading = true;
                         let res = await accountLogin(this.username,this.password,this.verification);
-                        this.RECORD_USERINFO(res.data);
-                        console.log(res.data);
+                        this.isLoading = false;
+                        switch (res.data.status) {
+                            case 0:
+                                alert('登录失败');
+                                break;
+                            case 1:
+                                alert('登录成功');
+                                this.RECORD_USERINFO(res.data.data.userInfo);
+                                // this.$router.go(-1);
+                                break;
+                            case 2:
+                                alert('验证码错误');
+                                break;
+                            case 3:
+                                alert('密码错误');
+                                break;
+                        }
                         break;
                 }
-                let res = await accountLogin(this.username,this.password,this.verification);
-                this.RECORD_USERINFO(res.data);
-                console.log(res.data);
+
             },
         }
     }
