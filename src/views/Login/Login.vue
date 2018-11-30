@@ -10,7 +10,7 @@
                 <el-input class="pwd" v-model="password" type="password" placeholder="请输入密码"></el-input>
                 <div class="verification">
                     <el-input class="code-input" v-model="verification" placeholder="请输入验证码"></el-input>
-                    <img class="code-img" :src="verificationCode" alt="">
+                    <img class="code-img" @click="getVerfication" :src="verificationCode" alt="">
                 </div>
                 <el-button class="login-btn" type="success" @click="login('accountLogin')">登录</el-button>
             </form>
@@ -45,7 +45,6 @@
         async mounted(){
             let res = await getVerificationCode();
             this.verificationCode = res.data.code;
-
         },
         methods: {
             ...mapMutations([
@@ -76,8 +75,11 @@
                         }
                         break;
                 }
-
             },
+            async getVerfication(){
+                let res = await getVerificationCode();
+                this.verificationCode = res.data.code;
+            }
         }
     }
 </script>
@@ -109,6 +111,8 @@
                     }
                     .code-img{
                         flex: 2;
+                        border:1px solid #eee;
+                        cursor: pointer;
                     }
                 }
                 .login-btn{
