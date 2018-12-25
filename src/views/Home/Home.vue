@@ -26,6 +26,7 @@
               <el-popover
                       placement="bottom-start"
                       width="730"
+                      v-model="isShowCityList"
                       trigger="click">
                 <div class="select">
                   <div class="select-title">
@@ -38,7 +39,11 @@
                       <span class="guess-city">{{cityGuess}}</span>
                     </div>
                     <div class="guess-r">
-                      <el-input v-model="searchCity" size="small" placeholder="请输入内容"></el-input>
+                      <el-input
+                              v-model="searchCity"
+                              size="small"
+                              placeholder="请输入内容"
+                      ></el-input>
                     </div>
                   </div>
                   <div class="select-group">
@@ -46,7 +51,7 @@
                       <div class="city-index">{{key}}</div>
                       <div class="city-list">
                         <ul>
-                          <li v-for="item in value" :key="item.id">{{item.name}}</li>
+                          <li v-for="item in value" :key="item.id" @click="cityListItemClick(item.id,item.name)">{{item.name}}</li>
                         </ul>
                       </div>
                     </div>
@@ -57,23 +62,44 @@
               </el-popover>
             </div>
             <div class="address-input">
-              <el-input placeholder="请输入内容" v-model="inputAddress" class="input-with-select">
+              <el-autocomplete
+                      placeholder="请输入您的收货地址"
+                      v-model="inputAddress"
+                      :fetch-suggestions="searchDetailLocation"
+                      @select="detailLocationSelect"
+                      class="input-with-select">
                 <el-button slot="append" icon="el-icon-search"></el-button>
-              </el-input>
+              </el-autocomplete>
             </div>
           </div>
         </main>
       </div>
 
     </div>
-    <footer></footer>
+    <my-footer :showCompanyInfo="true" :show-download-app="true"></my-footer>
+    <!--<footer>
+        &lt;!&ndash;<div class="download-app">
+            <div class="app-box">
+                <div class="app-picture">
+                    <img src="../../assets/app.png"/>
+                    <span>扫码下载 APP</span>
+                </div>
+                <div class="app-info">
+                    <span>新用户首次下单</span>
+                    <span>最高立减30元</span>
+                    <span>立即下载APP，享更多优惠吧！</span>
+                </div>
+            </div>
+        </div>&ndash;&gt;
+    </footer>-->
   </div>
 </template>
 
 <script>
 // @ is an alias to /src
 import HelloWorld from '@/components/HelloWorld.vue'
-import {cityGuess, cityHot, cityGroup} from "../../api/getData";
+import MyFooter from '../../components/Footer/MyFooter'
+import {cityGuess, cityHot, cityGroup,getDetailPlace} from "../../api/getData";
 
 export default {
     name: 'home',
@@ -83,12 +109,16 @@ export default {
             searchCity: '',
             cityGuess: '请选择',
             cityHot: [],
+            cityId:'',
+            isShowCityList:false,
             cityGroup: {},
             inputAddress: '',
+            detailLocationTimer: null,
         }
     },
     components: {
-      HelloWorld
+      HelloWorld,
+      MyFooter,
     },
     mounted() {
         this.initData();
@@ -98,6 +128,7 @@ export default {
         initData() {
             cityGuess().then((res) => {
                 this.cityGuess = res.data.name || this.msg;
+                this.cityId = res.data.id;
             });
 
             cityHot().then((res) => {
@@ -106,9 +137,34 @@ export default {
 
             cityGroup().then((res) => {
                 this.cityGroup = res.data || this.cityGroup;
-                console.log(this.cityGroup);
             })
+
+
         },
+        //点击某一个城市
+        cityListItemClick(cityId,cityName){
+            this.cityId = cityId;
+            this.isShowCityList = false;
+            this.cityGuess =  cityName;
+        },
+        //监听地址输入 显示建议
+        async searchDetailLocation(str,cb){
+            if(!str) {
+                return;
+            }
+
+            let res = await getDetailPlace(this.cityId, str);
+            console.log(res);
+            let data = [{ "value": "三全鲜食（北新泾店）", "address": "长宁区新渔路144号" }];
+            clearTimeout(this.detailLocationTimer);
+            this.detailLocationTimer = setTimeout(() => {
+                cb(data)
+            },3000*Math.random())
+        },
+        //选择地址
+        detailLocationSelect(item){
+            console.log(item);
+        }
     },
     computed: {
         //将获取的数据按照A-Z字母开头排序
@@ -128,9 +184,8 @@ export default {
   @import "../../style/mixin";
   .home{
     @include wh;
-    overflow: hidden;
     .home-top{
-      height: 600px;
+      height: 500px;
       background-color: $main-blue;
       .container{
         width: 1180px;
@@ -184,13 +239,13 @@ export default {
             }
             .address-input{
               flex: 4;
+              display:flex;
             }
           }
         }
       }
     }
   }
-
   /*选择城市弹窗*/
   .select{
     @include box-sizing();
@@ -272,5 +327,9 @@ export default {
     width: calc(100% - 110px);
   }*/
 
-
+.address-input{
+  .el-autocomplete{
+    flex:1;
+  }
+}
 </style>

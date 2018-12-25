@@ -3,7 +3,7 @@
         <loading v-if="isLoading"></loading>
         <main v-else class="main">
             <div class="logo-box">
-                <!--<img class="logo" src="../../assets/login-logo.svg" alt="">-->
+                <img class="logo" src="../../assets/login-logo.svg" alt="">
             </div>
             <form action="">
                 <el-input class="account" v-model="username" placeholder="请输入账号"></el-input>
@@ -15,16 +15,13 @@
                 <el-button class="login-btn" type="success" @click="login('accountLogin')">登录</el-button>
             </form>
         </main>
-        <footer>
-            <span class="owner">所有方：上海拉扎斯信息科技有限公司</span>
-            <span class="copyright">增值电信业务许可证 :沪B2-20150033|沪ICP备 09007032|上海工商行政管理 Copyright ©2008-2017 ele.me, All Rights Reserved.</span>
-            <img class="num" src="../../assets/footer-num.jpg"/>
-        </footer>
+        <my-footer :showCompanyInfo="true"></my-footer>
     </div>
 </template>
 
 <script>
     import Loading from '../../components/Loading'
+    import MyFooter from '../../components/Footer/MyFooter'
     import {mapMutations} from 'vuex'
     import {getVerificationCode, accountLogin} from "../../api/getData";
 
@@ -41,6 +38,7 @@
         name: "Login",
         components:{
             Loading,
+            MyFooter,
         },
         async mounted(){
             let res = await getVerificationCode();
@@ -86,10 +84,14 @@
 <style lang="scss" scoped>
     @import "../../style/mixin";
     .container{
+        display: flex;
+        flex-direction: column;
         @include wh();
         background-color: #fff;
         .main{
-            @include wh(300px, calc(100% - 60px));
+
+            width:300px;
+            flex:1 1 auto;
             @include marAuto;
             @include fj(center);
             flex-direction: column;
@@ -119,29 +121,6 @@
                     width: 100%;
                     font-size: 16px;
                 }
-            }
-        }
-        footer{
-            position: relative;
-            z-index: 2;
-            @include fj(center);
-            flex-direction: column;
-            text-align: center;
-            height: 100px;
-            background-color:$footer-color;
-            .num{
-                @include marAuto;
-                width: 100px;
-            }
-            .owner,.copyright{
-                font-size: 12px;
-                margin-bottom: 5px;
-            }
-            .owner{
-                color: #999999;
-            }
-            .copyright{
-                color: #bbbbbb;
             }
         }
     }

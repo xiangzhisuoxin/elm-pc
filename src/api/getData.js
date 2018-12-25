@@ -26,3 +26,10 @@ export const accountLogin = (username, password, captchaCode) => axios.post('/ap
     password,
     captchaCode
 });
+//选择地址页面 根据输入内容查询详细地址
+export const getDetailPlace = (cityId,keyword) => axios.get('/api/v1/pois',{
+    params:{
+        cityId,
+        keyword,
+    }
+})
