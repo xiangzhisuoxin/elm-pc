@@ -154,12 +154,21 @@ export default {
             }
 
             let res = await getDetailPlace(this.cityId, str);
-            console.log(res);
-            let data = [{ "value": "三全鲜食（北新泾店）", "address": "长宁区新渔路144号" }];
+            let placeListArr = res.data.data.cityRes.data;
+            let arr = [];
+            placeListArr.forEach((item) => {
+                arr.push({
+                    "value":item.address,
+                    "data":item
+                })
+            })
+            console.log(res.data.data.cityRes.data);
+            cb(arr)
+            /*let data = [{ "value": "三全鲜食（北新泾店）", "address": "长宁区新渔路144号" }];
             clearTimeout(this.detailLocationTimer);
             this.detailLocationTimer = setTimeout(() => {
                 cb(data)
-            },3000*Math.random())
+            },3000*Math.random())*/
         },
         //选择地址
         detailLocationSelect(item){

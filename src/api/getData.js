@@ -18,7 +18,7 @@ export const cityGroup = () => axios.get('/api/v1/cities', {
     }
 })
 
-export const getVerificationCode = () => axios.post('/api/v1/captchas')
+export const getVerificationCode = () => axios.post('/api/v2/captchas')
 
 export const accountLogin = (username, password, captchaCode) => axios.post('/api/v2/login', {
     type: 'account',
@@ -32,4 +32,5 @@ export const getDetailPlace = (cityId,keyword) => axios.get('/api/v1/pois',{
         cityId,
         keyword,
     }
-})
+});
+export const getFoodType = () => axios.get('/api/v1/foodType')

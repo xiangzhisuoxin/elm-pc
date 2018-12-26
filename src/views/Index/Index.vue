@@ -151,6 +151,7 @@
 </template>
 
 <script>
+    import {getFoodType} from '../../api/getData'
     export default {
         name: "Index",
         data(){
@@ -160,11 +161,19 @@
                 isLogin:false,
             }
         },
+        mounted(){
+            this.initData();
+        },
         methods:{
+            async initData(){
+                let res = await getFoodType();
+                console.log(res);
+            },
             topLinkClick(index){
                 this.topActiveIndex = index;
             },
-        }
+        },
+
     }
 </script>
 
