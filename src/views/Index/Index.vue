@@ -47,25 +47,7 @@
                     <div class="category-l">商家分类：</div>
                     <div class="category-r">
                         <ul class="clear">
-                            <li>全部商家</li>
-                            <li>全部商家</li>
-                            <li>全部商家</li>
-                            <li>全部商家</li>
-                            <li>全部商家</li>
-                            <li>全部商家</li>
-                            <li>全部商家</li>
-                            <li>全部商家</li>
-                            <li>全部商家</li>
-                            <li>全部商家</li>
-                            <li>全部商家</li>
-                            <li>全部商家</li>
-                            <li>全部商家</li>
-                            <li>全部商家</li>
-                            <li>全部商家</li>
-                            <li>全部商家</li>
-                            <li>全部商家</li>
-                            <li>全部商家</li>
-                            <li>全部商家</li>
+                            <li v-for="item in foodTypeList">{{item.title}}</li>
                         </ul>
                     </div>
                 </div>
@@ -159,6 +141,7 @@
                 isShowQR: false,
                 topActiveIndex:1,
                 isLogin:false,
+                foodTypeList:[],
             }
         },
         mounted(){
@@ -166,8 +149,17 @@
         },
         methods:{
             async initData(){
+                if (!this.latitude) {
+                    //获取位置信息
+                    let res = await msiteAddress(this.geohash);
+                    // 记录当前经度纬度进入vuex
+                    this.RECORD_ADDRESS(res);
+                }
+
                 let res = await getFoodType();
-                console.log(res);
+                if (res.data.status = 1) {
+                    this.foodTypeList = res.data.data;
+                }
             },
             topLinkClick(index){
                 this.topActiveIndex = index;
