@@ -162,7 +162,6 @@ export default {
                     "data":item
                 })
             })
-            console.log(res.data.data.cityRes.data);
             cb(arr)
             /*let data = [{ "value": "三全鲜食（北新泾店）", "address": "长宁区新渔路144号" }];
             clearTimeout(this.detailLocationTimer);
@@ -172,7 +171,10 @@ export default {
         },
         //选择地址
         detailLocationSelect(item){
-            console.log(item);
+            let geohash = item.data.location.lat+','+item.data.location.lng;
+            this.$router.push({path:'Index',query:{
+                    geohash
+                }})
         }
     },
     computed: {

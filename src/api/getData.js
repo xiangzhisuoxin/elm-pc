@@ -36,4 +36,8 @@ export const getDetailPlace = (cityId,keyword) => axios.get('/api/v1/pois',{
 export const getFoodType = () => axios.get('/api/v1/foodType')
 
 //获取商家列表
-export const getShopList = () => axios.get('/api/v1/shopList')
+export const getDetailFoodType = () => axios.get('/api/v1/detailFoodType');
+
+//获取商家列表
+export const getShopList = () => axios.get('/api/v1/shopList');
+

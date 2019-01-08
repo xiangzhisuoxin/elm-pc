@@ -46,8 +46,12 @@
                 <div class="category">
                     <div class="category-l">商家分类：</div>
                     <div class="category-r">
-                        <ul class="clear">
-                            <li v-for="item in foodTypeList">{{item.title}}</li>
+                        <ul class="clear food-type">
+                            <li class="food-type-active" @click="foodTypeClick($event)">全部商家</li>
+                            <li v-for="item in foodTypeList" @click="foodTypeClick($event)">{{item.title}}</li>
+                        </ul>
+                        <ul class="type-detail clear" v-if="isShowTypeDetail">
+                            <li v-for="(item, index) in selectDetailFoodTypeList.sub_categories" :key="index">{{item.name}}</li>
                         </ul>
                     </div>
                 </div>
@@ -133,15 +137,19 @@
 </template>
 
 <script>
-    import {getFoodType} from '../../api/getData'
+    import {getFoodType, getDetailFoodType} from '../../api/getData'
+    import {clickUtil} from '../../jsUtil/mUtils'
     export default {
         name: "Index",
         data(){
             return{
                 isShowQR: false,
                 topActiveIndex:1,
+                isShowTypeDetail:false,
                 isLogin:false,
                 foodTypeList:[],
+                detailFoodTypeList:[],
+                selectDetailFoodTypeList:{},
             }
         },
         mounted(){
@@ -149,135 +157,171 @@
         },
         methods:{
             async initData(){
-                if (!this.latitude) {
+                /*if (!this.latitude) {
                     //获取位置信息
                     let res = await msiteAddress(this.geohash);
                     // 记录当前经度纬度进入vuex
                     this.RECORD_ADDRESS(res);
-                }
+                }*/
 
                 let res = await getFoodType();
-                if (res.data.status = 1) {
+                if (res.data.status == 1) {
                     this.foodTypeList = res.data.data;
+                }
+
+                let resDFT = await getDetailFoodType();
+                if (resDFT.data.status == 1) {
+                    this.detailFoodTypeList = resDFT.data.data;
                 }
             },
             topLinkClick(index){
                 this.topActiveIndex = index;
             },
+
+            //商家列表点击事件
+            foodTypeClick(e){
+                clickUtil({
+                    el:e.target,
+                    activeClass:'food-type-active',
+                    callback: (el) => {
+                        let index = $(el).index();
+                        if (index == 0) {
+                            this.isShowTypeDetail = false;
+                        } else {
+                            this.isShowTypeDetail = true;
+                            this.selectDetailFoodTypeList = this.detailFoodTypeList[index];
+                            if (!this.selectDetailFoodTypeList) {
+                                this.isShowTypeDetail = false;
+                            }
+                        }
+                    }
+                })
+            }
         },
 
     }
 </script>
 
+<style lang="scss">
+    .search-food{
+        input{
+            width: 180px;
+            transition:all 0.3s;
+            &:focus{
+                width:300px;
+            }
+        }
+    }
+</style>
 <style lang="scss" scoped >
     @import "../../style/mixin";
     .wrap{
         width:100%;
         header{
+            width: 100%;
+            .top{
                 width: 100%;
-                .top{
-                    width: 100%;
-                    height: 60px;
-                    min-width: 1080px;
-                    background-color:$main-blue;
-                    @include marAuto;
-                    @include fj();
-                    color:#fff;
-                    line-height: 60px;
-                    .top-left{
+                height: 60px;
+                min-width: 1080px;
+                background-color:$main-blue;
+                @include marAuto;
+                @include fj();
+                color:#fff;
+                line-height: 60px;
+                .top-left{
 
-                        @include fj();
-                        .logo{
-                            height: 60px;
-                            color:#fff;
-                        }
-                        >ul{
-                            >li{
-                                float: left;
-                                cursor: pointer;
-                                display: inline-block;
-                                @include wh(130px, auto);
-                                color:#fff;
-                                text-align: center;
-                                font-size: 16px;
-                                &:hover{
-                                    background: #0c77d1;
-                                }
-                                &.top-active{
-                                    background-color: #006bc7;
-                                }
-                            }
-                        }
+                    @include fj();
+                    .logo{
+                        height: 60px;
+                        color:#fff;
                     }
-                    .top-right{
-                        @include fj();
-                        .more{
-                            margin-right: 80px;
-                            >li{
-                                float: left;
-                                display: inline-block;
-                                @include wh(110px, auto);
-                                cursor: pointer;
-                                text-align: center;
-                                color:#fff;
-                                font-size: 14px;
-                                opacity: 0.8;
-                                &:hover{
-                                    opacity: 1;
-                                }
-                                >i{
-                                    color: #fff;
-                                    font-size: 22px;
-                                    position: relative;
-                                    top: 2px;
-                                    margin-right: 5px;
-                                }
-                                >.phone{
-                                    display: flex;
-                                    flex-direction: column;
-                                    width: 220px;
-                                    @include fj(center);
-                                    /*border:1px solid #aaa;*/
-                                    box-shadow: 0 1px 2px rgba(0,0,0,.5);
-                                    position: relative;
-                                    top: -5px;
-                                    background-color: #fff;
-                                    cursor: auto;
-                                    &::before{
-                                        content: ' ';
-                                        border: 5px solid #fff;
-                                        display: block;
-                                        position: absolute;
-                                        top: -10px;
-                                        border-color: transparent transparent #fff;
-                                        right: auto;
-                                        left: 20px;
-                                    }
-                                    >span{
-                                        font-weight: bold;
-                                        font-size: 16px;
-                                        text-align: center;
-                                        height: 30px;
-                                        line-height: 30px;
-                                    }
-                                    >img{
-                                        width: 200px;
-                                        height: 200px;
-                                        @include marAuto;
-                                        margin-bottom: 10px;
-                                    }
-                                }
-                            }
-                        }
-                        .btn-login{
-                            color:#fff;
-                            font-size: 14px;
+                    >ul{
+                        >li{
+                            float: left;
                             cursor: pointer;
-                            margin-right: 30px;
+                            display: inline-block;
+                            @include wh(130px, auto);
+                            color:#fff;
+                            text-align: center;
+                            font-size: 16px;
+                            &:hover{
+                                background: #0c77d1;
+                            }
+                            &.top-active{
+                                background-color: #006bc7;
+                            }
                         }
                     }
                 }
-    }
+                .top-right{
+                    @include fj();
+                    .more{
+                        margin-right: 80px;
+                        >li{
+                            float: left;
+                            display: inline-block;
+                            @include wh(110px, auto);
+                            cursor: pointer;
+                            text-align: center;
+                            color:#fff;
+                            font-size: 14px;
+                            opacity: 0.8;
+                            &:hover{
+                                opacity: 1;
+                            }
+                            >i{
+                                color: #fff;
+                                font-size: 22px;
+                                position: relative;
+                                top: 2px;
+                                margin-right: 5px;
+                            }
+                            >.phone{
+                                display: flex;
+                                flex-direction: column;
+                                width: 220px;
+                                @include fj(center);
+                                /*border:1px solid #aaa;*/
+                                box-shadow: 0 1px 2px rgba(0,0,0,.5);
+                                position: relative;
+                                top: -5px;
+                                background-color: #fff;
+                                cursor: auto;
+                                &::before{
+                                    content: ' ';
+                                    border: 5px solid #fff;
+                                    display: block;
+                                    position: absolute;
+                                    top: -10px;
+                                    border-color: transparent transparent #fff;
+                                    right: auto;
+                                    left: 20px;
+                                }
+                                >span{
+                                    font-weight: bold;
+                                    font-size: 16px;
+                                    text-align: center;
+                                    height: 30px;
+                                    line-height: 30px;
+                                }
+                                >img{
+                                    width: 200px;
+                                    height: 200px;
+                                    @include marAuto;
+                                    margin-bottom: 10px;
+                                }
+                            }
+                        }
+                    }
+                    .btn-login{
+                        color:#fff;
+                        font-size: 14px;
+                        cursor: pointer;
+                        margin-right: 30px;
+                    }
+                }
+            }
+        }
         main{
             .contain{
                 width:100%;
@@ -321,15 +365,31 @@
                     }
                     .category-r{
                         flex: 15;
-                        >ul{
+                        .food-type{
                             >li{
                                 float: left;
                                 padding:8px 10px;
                                 color:#666;
                                 cursor: pointer;
                                 margin-right: 10px;
-                                &:hover{
+                                &:hover,
+                                &.food-type-active{
                                     background-color: #f6f6f6;
+                                }
+                            }
+                        }
+                        .type-detail{
+                            background-color: #f6f6f6;
+                            padding:8px 4px;
+                            >li{
+                                float: left;
+                                color:#666;
+                                cursor: pointer;
+                                margin:3px 5px;
+                                padding:3px 6px;
+                                &.type-detail-active{
+                                    color:#fff;
+                                    background-color: #0089dc;
                                 }
                             }
                         }
@@ -426,17 +486,6 @@
                         }
                     }
                 }
-            }
-        }
-    }
-</style>
-<style lang="scss">
-    .search-food{
-        input{
-            width: 180px;
-            transition:all 0.3s;
-            &:focus{
-                width:300px;
             }
         }
     }
