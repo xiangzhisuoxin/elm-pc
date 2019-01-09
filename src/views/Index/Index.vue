@@ -47,11 +47,15 @@
                     <div class="category-l">商家分类：</div>
                     <div class="category-r">
                         <ul class="clear food-type">
-                            <li class="food-type-active" @click="foodTypeClick($event)">全部商家</li>
-                            <li v-for="item in foodTypeList" @click="foodTypeClick($event)">{{item.title}}</li>
+                            <!--<li class="food-type-active" @click="foodTypeClick($event)">全部商家</li>-->
+                            <!--<li v-for="item in foodTypeList" @click="foodTypeClick($event)">{{item.title}}</li>-->
+                            <li v-for="(item, index) in detailFoodTypeList" @click="foodTypeClick($event,index)" :key="index">{{item.name}}</li>
                         </ul>
                         <ul class="type-detail clear" v-if="isShowTypeDetail">
-                            <li v-for="(item, index) in selectDetailFoodTypeList.sub_categories" :key="index">{{item.name}}</li>
+                            <li v-for="(item, index) in selectDetailFoodTypeList.sub_categories"
+                                @click="typeDetailClick($event)"
+                                :class="{'type-detail-active': index == 0}"
+                                :key="index">{{item.name}}</li>
                         </ul>
                     </div>
                 </div>
@@ -137,12 +141,13 @@
 </template>
 
 <script>
-    import {getFoodType, getDetailFoodType} from '../../api/getData'
+    import {getFoodType, getDetailFoodType, getAddressInfo, cityGuess} from '../../api/getData'
     import {clickUtil} from '../../jsUtil/mUtils'
     export default {
         name: "Index",
         data(){
             return{
+                geohash:'',
                 isShowQR: false,
                 topActiveIndex:1,
                 isShowTypeDetail:false,
@@ -152,49 +157,81 @@
                 selectDetailFoodTypeList:{},
             }
         },
+        async beforeMount(){
+            if (!this.$route.query.geohash) {
+                const address = await cityGuess();
+                this.geohash = address.data.latitude + ',' + address.data.longitude;
+            } else {
+                this.geohash = this.$route.query.geohash
+            }
+
+            let res = await getAddressInfo(this.geohash);
+        },
         mounted(){
             this.initData();
         },
         methods:{
             async initData(){
-                /*if (!this.latitude) {
+                if (!this.latitude) {
                     //获取位置信息
-                    let res = await msiteAddress(this.geohash);
-                    // 记录当前经度纬度进入vuex
-                    this.RECORD_ADDRESS(res);
-                }*/
-
-                let res = await getFoodType();
-                if (res.data.status == 1) {
-                    this.foodTypeList = res.data.data;
+                    getAddressInfo(this.geohash).then((res) => {
+                        // 记录当前经度纬度进入vuex
+                        this.RECORD_ADDRESS(res);
+                    });
                 }
 
-                let resDFT = await getDetailFoodType();
-                if (resDFT.data.status == 1) {
-                    this.detailFoodTypeList = resDFT.data.data;
-                }
+                /*getFoodType().then((res) => {
+                    if(res.data.status == 1) {
+                        this.foodTypeList = res.data.data;
+                    }
+                });*/
+
+                getDetailFoodType().then((res) => {
+                    if (res.data.status == 1) {
+                        this.detailFoodTypeList = res.data.data;
+                        console.log(this.detailFoodTypeList);
+                    }
+                });
+
             },
             topLinkClick(index){
                 this.topActiveIndex = index;
             },
 
             //商家列表点击事件
-            foodTypeClick(e){
+            foodTypeClick(e,index){
                 clickUtil({
                     el:e.target,
                     activeClass:'food-type-active',
                     callback: (el) => {
-                        let index = $(el).index();
-                        if (index == 0) {
+                        if (this.detailFoodTypeList[index].sub_categories.length) {
+                            this.isShowTypeDetail = true;
+                            this.selectDetailFoodTypeList = this.detailFoodTypeList[index];
+
+                            $('.type-detail li').removeClass('type-detail-active').eq(0).addClass('type-detail-active');
+                        } else {
                             this.isShowTypeDetail = false;
+                        }
+
+                        /*let elIndex = $(el).index();
+                        if (elIndex == 0) {
                         } else {
                             this.isShowTypeDetail = true;
                             this.selectDetailFoodTypeList = this.detailFoodTypeList[index];
+                            console.log(this.selectDetailFoodTypeList);
                             if (!this.selectDetailFoodTypeList) {
                                 this.isShowTypeDetail = false;
                             }
-                        }
+                        }*/
                     }
+                })
+            },
+
+            typeDetailClick(e){
+                clickUtil({
+                    el:e.target,
+                    activeClass: 'type-detail-active',
+
                 })
             }
         },
@@ -381,6 +418,7 @@
                         .type-detail{
                             background-color: #f6f6f6;
                             padding:8px 4px;
+                            margin-top: 10px;
                             >li{
                                 float: left;
                                 color:#666;
@@ -390,6 +428,7 @@
                                 &.type-detail-active{
                                     color:#fff;
                                     background-color: #0089dc;
+                                    border-radius: 5px;
                                 }
                             }
                         }

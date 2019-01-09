@@ -41,3 +41,10 @@ export const getDetailFoodType = () => axios.get('/api/v1/detailFoodType');
 //获取商家列表
 export const getShopList = () => axios.get('/api/v1/shopList');
 
+//获取地址信息
+export const getAddressInfo = (geohash) => axios.get('/api/v1/addressInfo',{
+    params:{
+        geohash
+    }
+});
+
