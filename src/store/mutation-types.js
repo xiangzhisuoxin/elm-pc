@@ -1,1 +1,2 @@
 export const RECORD_USERINFO = 'RECORD_USERINFO';
+export const RECORD_ADDRESS = 'RECORD_ADDRESS';
