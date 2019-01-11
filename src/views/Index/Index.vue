@@ -141,7 +141,7 @@
 </template>
 
 <script>
-    import {getFoodType, getDetailFoodType, getAddressInfo, cityGuess} from '../../api/getData'
+    import {getFoodType, getDetailFoodType, getAddressInfo, cityGuess,getShopList} from '../../api/getData'
     import {clickUtil} from '../../jsUtil/mUtils'
     export default {
         name: "Index",
@@ -165,20 +165,26 @@
                 this.geohash = this.$route.query.geohash
             }
 
-            let res = await getAddressInfo(this.geohash);
+            //let res = await getAddressInfo(this.geohash);
+            let res = await getShopList({
+                latitude:31,
+                longitude:121,
+                restaurant_category_id:207,
+                restaurant_category_ids:265
+            });
         },
         mounted(){
             this.initData();
         },
         methods:{
             async initData(){
-                if (!this.latitude) {
+                /*if (!this.latitude) {
                     //获取位置信息
                     getAddressInfo(this.geohash).then((res) => {
                         // 记录当前经度纬度进入vuex
                         this.RECORD_ADDRESS(res);
                     });
-                }
+                }*/
 
                 /*getFoodType().then((res) => {
                     if(res.data.status == 1) {

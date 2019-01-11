@@ -6,7 +6,7 @@ import store from './store/store'
 
 import "./style/common.scss";
 import 'element-ui/lib/theme-chalk/index.css';
-import 'font-awesome/css/font-awesome.css';
+//import 'font-awesome/css/font-awesome.css';
 
 Vue.use(ElementUI);
 Vue.config.productionTip = false
