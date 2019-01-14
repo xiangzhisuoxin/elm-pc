@@ -100,6 +100,7 @@
 import HelloWorld from '@/components/HelloWorld.vue'
 import MyFooter from '../../components/Footer/MyFooter'
 import {cityGuess, cityHot, cityGroup,getDetailPlace} from "../../api/getData";
+import { mapState, mapMutations } from "vuex";
 
 export default {
     name: 'home',
@@ -124,6 +125,7 @@ export default {
         this.initData();
     },
     methods: {
+        ...mapMutations(['RECORD_ADDRESS']),
         //初始化数据
         initData() {
             cityGuess().then((res) => {
@@ -138,7 +140,6 @@ export default {
             cityGroup().then((res) => {
                 this.cityGroup = res.data || this.cityGroup;
             })
-
 
         },
         //点击某一个城市
@@ -169,12 +170,14 @@ export default {
                 cb(data)
             },3000*Math.random())*/
         },
-        //选择地址
+        //选择地址 跳转到HOME页面
         detailLocationSelect(item){
-            let geohash = item.data.location.lat+','+item.data.location.lng;
-            this.$router.push({path:'Index',query:{
-                    geohash
-                }})
+            let address = {
+                longitude: item.data.location.lng,
+                latitude: item.data.location.lat
+            };
+            this.RECORD_ADDRESS(address);
+            this.$router.push({path:'Index', query: address});
         }
     },
     computed: {

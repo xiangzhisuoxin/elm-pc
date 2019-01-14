@@ -49,92 +49,29 @@
                         <ul class="clear food-type">
                             <!--<li class="food-type-active" @click="foodTypeClick($event)">全部商家</li>-->
                             <!--<li v-for="item in foodTypeList" @click="foodTypeClick($event)">{{item.title}}</li>-->
-                            <li v-for="(item, index) in detailFoodTypeList" @click="foodTypeClick($event,index)" :key="index">{{item.name}}</li>
+                            <li v-for="(item, index) in detailFoodTypeList"
+                                @click="foodTypeClick($event,item, index)"
+                                :key="index"
+                                :class="{'food-type-active': index == 0}"
+                            >{{item.name}}</li>
                         </ul>
                         <ul class="type-detail clear" v-if="isShowTypeDetail">
                             <li v-for="(item, index) in selectDetailFoodTypeList.sub_categories"
-                                @click="typeDetailClick($event)"
+                                @click="typeDetailClick($event, item)"
                                 :class="{'type-detail-active': index == 0}"
                                 :key="index">{{item.name}}</li>
                         </ul>
                     </div>
                 </div>
                 <!--商家列表-->
-                <div class="shop-list">
-                    <ul class="clear">
-                        <li>
-                            <div class="list-item-l">
-                                <img src="../../assets/hanbao.webp"/>
-                                <div class="list-item-l-span">22分钟</div>
-                            </div>
-                            <div class="list-item-r">
-                                <div class="shop-title">汉堡王汉堡王汉堡王汉堡王汉堡王汉堡王</div>
-                                <div class="star-level"></div>
-                                <div class="delivery-cost">配送费¥5</div>
-                                <div class="icon-list">
-                                    <i>票</i><i>票</i>
-                                </div>
-                            </div>
-                        </li>
-                        <li>
-                            <div class="list-item-l">
-                                <img src="../../assets/hanbao.webp"/>
-                                <div class="list-item-l-span">22分钟</div>
-                            </div>
-                            <div class="list-item-r">
-                                <div class="shop-title">汉堡王汉堡王汉堡王汉堡王汉堡王汉堡王</div>
-                                <div class="star-level"></div>
-                                <div class="delivery-cost">配送费¥5</div>
-                                <div class="icon-list">
-                                    <i>票</i><i>票</i>
-                                </div>
-                            </div>
-                        </li>
-                        <li>
-                            <div class="list-item-l">
-                                <img src="../../assets/hanbao.webp"/>
-                                <div class="list-item-l-span">22分钟</div>
-                            </div>
-                            <div class="list-item-r">
-                                <div class="shop-title">汉堡王汉堡王汉堡王汉堡王汉堡王汉堡王</div>
-                                <div class="star-level"></div>
-                                <div class="delivery-cost">配送费¥5</div>
-                                <div class="icon-list">
-                                    <i>票</i><i>票</i>
-                                </div>
-                            </div>
-                        </li>
-                        <li>
-                            <div class="list-item-l">
-                                <img src="../../assets/hanbao.webp"/>
-                                <div class="list-item-l-span">22分钟</div>
-                            </div>
-                            <div class="list-item-r">
-                                <div class="shop-title">汉堡王汉堡王汉堡王汉堡王汉堡王汉堡王</div>
-                                <div class="star-level"></div>
-                                <div class="delivery-cost">配送费¥5</div>
-                                <div class="icon-list">
-                                    <i>票</i><i>票</i>
-                                </div>
-                            </div>
-                        </li>
-                        <li>
-                            <div class="list-item-l">
-                                <img src="../../assets/hanbao.webp"/>
-                                <div class="list-item-l-span">22分钟</div>
-                            </div>
-                            <div class="list-item-r">
-                                <div class="shop-title">汉堡王汉堡王汉堡王汉堡王汉堡王汉堡王</div>
-                                <div class="star-level"></div>
-                                <div class="delivery-cost">配送费¥5</div>
-                                <div class="icon-list">
-                                    <i>票</i><i>票</i>
-                                </div>
-                            </div>
-                        </li>
-                    </ul>
-                    <div class="more-login" v-if="!isLogin">查看更多商家，请先<span class="highlight">登录</span></div>
-                </div>
+                <shop-list :restaurantCategoryId="restaurantCategoryId"
+                           :restaurantCategoryIds="restaurantCategoryIds"
+                           :sortByType='sortByType'
+                           :deliveryMode="delivery_mode"
+                           :confirmSelect="confirmStatus"
+                           :supportIds="support_ids"
+                           v-if="latitude"
+                ></shop-list>
             </div>
         </main>
     </div>
@@ -142,62 +79,56 @@
 
 <script>
     import {getFoodType, getDetailFoodType, getAddressInfo, cityGuess,getShopList} from '../../api/getData'
-    import {clickUtil} from '../../jsUtil/mUtils'
+    import {clickUtil} from '../../jsUtil/mUtils';
+    import { mapState, mapMutations } from "vuex";
+    import ShopList from '../../components/common/ShopList'
+
     export default {
         name: "Index",
-        data(){
+        components:{
+            ShopList
+        },
+        data() {
             return{
-                geohash:'',
+                latitude:'',
+                longitude:'',
                 isShowQR: false,
                 topActiveIndex:1,
                 isShowTypeDetail:false,
-                isLogin:false,
                 foodTypeList:[],
                 detailFoodTypeList:[],
                 selectDetailFoodTypeList:{},
+                sortByType: undefined,
+                restaurantCategoryId: undefined,
+                restaurantCategoryIds: undefined,
+                confirmStatus: undefined,
+                support_ids: undefined,
+                delivery_mode: undefined,
             }
         },
-        async beforeMount(){
-            if (!this.$route.query.geohash) {
+        async beforeMount() {
+            if (!this.$route.query.latitude || !this.$route.query.longitude) {
                 const address = await cityGuess();
-                this.geohash = address.data.latitude + ',' + address.data.longitude;
+                this.latitude = address.data.latitude;
+                this.longitude = address.data.longitude;
             } else {
-                this.geohash = this.$route.query.geohash
+                this.latitude = this.$route.query.latitude;
+                this.longitude = this.$route.query.longitude;
+                this.RECORD_ADDRESS({latitude:this.latitude, longitude: this.longitude});
             }
-
-            //let res = await getAddressInfo(this.geohash);
-            let res = await getShopList({
-                latitude:31,
-                longitude:121,
-                restaurant_category_id:207,
-                restaurant_category_ids:265
-            });
         },
         mounted(){
             this.initData();
         },
         methods:{
+            ...mapMutations(['RECORD_ADDRESS']),
+
             async initData(){
-                /*if (!this.latitude) {
-                    //获取位置信息
-                    getAddressInfo(this.geohash).then((res) => {
-                        // 记录当前经度纬度进入vuex
-                        this.RECORD_ADDRESS(res);
-                    });
-                }*/
-
-                /*getFoodType().then((res) => {
-                    if(res.data.status == 1) {
-                        this.foodTypeList = res.data.data;
-                    }
-                });*/
-
-                getDetailFoodType().then((res) => {
-                    if (res.data.status == 1) {
-                        this.detailFoodTypeList = res.data.data;
-                        console.log(this.detailFoodTypeList);
-                    }
-                });
+                let res = await getDetailFoodType();
+                if (res.data.status == 1) {
+                    this.detailFoodTypeList = res.data.data;
+                    console.log(this.detailFoodTypeList);
+                }
 
             },
             topLinkClick(index){
@@ -205,7 +136,7 @@
             },
 
             //商家列表点击事件
-            foodTypeClick(e,index){
+            foodTypeClick(e, item, index){
                 clickUtil({
                     el:e.target,
                     activeClass:'food-type-active',
@@ -213,9 +144,19 @@
                         if (this.detailFoodTypeList[index].sub_categories.length) {
                             this.isShowTypeDetail = true;
                             this.selectDetailFoodTypeList = this.detailFoodTypeList[index];
-
                             $('.type-detail li').removeClass('type-detail-active').eq(0).addClass('type-detail-active');
+                            this.restaurantCategoryId = item.id || undefined;
+                            this.restaurantCategoryIds = item.sub_categories[0].id;
+
                         } else {
+                            //改变店铺类型
+                            if (this.detailFoodTypeList[index].id) {
+                                this.restaurantCategoryId = this.detailFoodTypeList[index].id;
+                                this.restaurantCategoryIds = undefined;
+                            } else {
+                                this.restaurantCategoryIds = undefined;
+                                this.restaurantCategoryId = undefined;
+                            }
                             this.isShowTypeDetail = false;
                         }
 
@@ -233,11 +174,13 @@
                 })
             },
 
-            typeDetailClick(e){
+            typeDetailClick(e, item){
                 clickUtil({
                     el:e.target,
                     activeClass: 'type-detail-active',
-
+                    callback: (el) => {
+                        this.restaurantCategoryIds = item.id || undefined;
+                    }
                 })
             }
         },
@@ -440,97 +383,7 @@
                         }
                     }
                 }
-                .shop-list{
-                    margin-top: 30px;
-                    @include bd;
-                    background-color: #fff;
-                    >ul{
-                        >li{
-                            float: left;
-                            width:25%;
-                            padding: 20px;
-                            @include fj();
-                            cursor: pointer;
-                            border-bottom: 1px solid #e6e6e6;
-                            &:hover{
-                                background-color: $footer-color;
-                            }
-                            .list-item-l{
-                                flex:1;
-                                @include fj(center);
-                                flex-direction: column;
-                                align-items: center;
-                                >img{
-                                    @include wh(70px, 70px);
-                                }
-                                .list-item-l-span{
-                                    display: block;
-                                    margin-top: 10px;
-                                    text-align: center;
-                                    color: $gray;
-                                    font-size: 12px;
-                                }
-                            }
-                            .list-item-r{
-                                flex:2;
-                                flex-wrap: nowrap;
-                                display: flex;
-                                flex-direction: column;
-                                padding-left: 15px;
-                                .shop-title{
-                                    width: 200px;
-                                    font-size: 16px;
-                                    padding-right: 30px;
-                                    margin-bottom: 6px;
-                                    font-weight: 600;
-                                    overflow: hidden;
-                                    white-space: nowrap;
-                                    text-overflow: ellipsis;
-                                    color: #333;
-                                }
-                                .star-level{
 
-                                }
-                                .delivery-cost{
-                                    font-size: 12px;
-                                    color: $gray;
-                                    margin-top: 3px;
-                                }
-                                .icon-list{
-                                    margin-top: 5px;
-                                    >i{
-                                        display: inline-block;
-                                        background: #fff;
-                                        color: #999999;
-                                        border: 1px solid;
-                                        vertical-align: middle;
-                                        font-style: normal;
-                                        font-size: 12px;
-                                        line-height: 16px;
-                                        overflow: hidden;
-                                        text-align: center;
-                                        width: 18px;
-                                        border-radius: 2px;
-                                        margin-right: 3px;
-                                        white-space: nowrap;
-                                    }
-                                }
-                            }
-                        }
-                    }
-                    .more-login{
-                        height: 50px;
-                        line-height: 50px;
-                        font-size: 18px;
-                        color:#333;
-                        border-top: 1px solid #e6e6e6;
-                        text-align: center;
-                        margin-top: -1px;
-                        .highlight{
-                            cursor: pointer;
-                        }
-                    }
-                }
             }
         }
     }
