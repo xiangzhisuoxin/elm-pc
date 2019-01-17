@@ -1,36 +1,72 @@
 <template>
     <div class="shop-list">
+        <loading v-if="isLoading"></loading>
         <ul class="clear">
             <li v-for="(item, index) in shopList"
                 :key="index">
-                <div class="list-item-l">
-                    <!--<img :src="'//elm.cangdu.org/img/' + item.image_path"/>-->
-                    <img src="//elm.cangdu.org/img/164ad0b6a3917599.jpg"/>
-                    <div class="list-item-l-span">22分钟</div>
-                </div>
-                <div class="list-item-r">
-                    <div class="shop-title">{{item.name}}</div>
-                    <div class="star-level">
-                        <div class="star-dark">
-                            <i class="el-icon-star-on"></i>
-                            <i class="el-icon-star-on"></i>
-                            <i class="el-icon-star-on"></i>
-                            <i class="el-icon-star-on"></i>
-                            <i class="el-icon-star-on"></i>
-                        </div>
-                        <div class="star-light" :style="'width:'+(item.rating/5*100).toFixed(2)+'%'">
-                            <i class="el-icon-star-on"></i>
-                            <i class="el-icon-star-on"></i>
-                            <i class="el-icon-star-on"></i>
-                            <i class="el-icon-star-on"></i>
-                            <i class="el-icon-star-on"></i>
+                <el-popover
+                        placement="right"
+                        width="250"
+                        trigger="hover">
+                    <!--商品hover弹出详细信息-->
+                    <div class="shop-hover">
+                        <div class="shop-detail">
+                            <div class="detail-title">{{item.name}}</div>
+                            <div class="detail-type">{{item.category}}</div>
+                            <div class="detail-supports">
+                                <ul>
+                                    <li v-for="icon in item.supports">
+                                        <i class="support-icon" :style="'color:#'+icon.icon_color">{{icon.icon_name}}</i>
+                                        <span>{{icon.description}}</span>
+                                    </li>
+                                </ul>
+                            </div>
+                            <div class="detail-minite">
+                                <div class="send-cost">{{item.piecewise_agent_fee.tips}}</div>
+                                <div class="distance">平均 <span class="distance-light">{{item.order_lead_time}}</span>分钟到达</div>
+                            </div>
+                            <div class="detail-des">{{item.description}}</div>
                         </div>
                     </div>
-                    <div class="delivery-cost">{{item.piecewise_agent_fee.tips}}</div>
-                    <div class="icon-list">
-                        <i v-for="icon in item.supports" :style="icon.icon_color">{{icon.icon_name}}</i>
+                    <!--商品列表-->
+                    <div slot="reference">
+                        <div class="list-item-l">
+                            <!--<img :src="'//elm.cangdu.org/img/' + item.image_path"/>-->
+                            <img src="//elm.cangdu.org/img/164ad0b6a3917599.jpg"/>
+                            <div class="list-item-l-span">22分钟</div>
+                        </div>
+                        <div class="list-item-r">
+                            <div class="shop-title">{{item.name}}</div>
+                            <div class="star-level">
+                                <el-rate
+                                        v-model="item.rating"
+                                        disabled
+                                        show-score
+                                        text-color="#ff9900">
+                                </el-rate>
+                                <!--<div class="star-dark">
+                                    <i class="el-icon-star-on"></i>
+                                    <i class="el-icon-star-on"></i>
+                                    <i class="el-icon-star-on"></i>
+                                    <i class="el-icon-star-on"></i>
+                                    <i class="el-icon-star-on"></i>
+                                </div>
+                                <div class="star-light" :style="'width:'+(item.rating/5*100).toFixed(2)+'%'">
+                                    <i class="el-icon-star-on"></i>
+                                    <i class="el-icon-star-on"></i>
+                                    <i class="el-icon-star-on"></i>
+                                    <i class="el-icon-star-on"></i>
+                                    <i class="el-icon-star-on"></i>
+                                </div>-->
+                            </div>
+                            <div class="delivery-cost">{{item.piecewise_agent_fee.tips}}</div>
+                            <div class="icon-list">
+                                <i class="support-icon" v-for="icon in item.supports" :style="'color:#'+icon.icon_color">{{icon.icon_name}}</i>
+                            </div>
+                        </div>
                     </div>
-                </div>
+                </el-popover>
+
             </li>
         </ul>
         <div class="more-login" v-if="!isLogin">查看更多商家，请先<span class="highlight">登录</span></div>
@@ -40,14 +76,19 @@
 <script>
     import {getShopList} from '../../api/getData'
     import {mapState, mapMutations} from "vuex";
+    import Loading from '../../components/Loading';
 
     export default {
         name: "ShopList",
+        components:{
+            Loading
+        },
         data() {
             return {
                 offset: 0,
                 limit: 20,
                 isLogin: false,
+                isLoading: true,
                 shopList: [],
             }
         },
@@ -81,6 +122,7 @@
              * 数据初始化
              */
             initData() {
+                this.isLoading = true;
                 getShopList({
                     latitude: this.latitude,
                     longitude: this.longitude,
@@ -92,11 +134,13 @@
                     if (res.data.status == 1) {
                         this.shopList = [...res.data.data];
                         console.log(res.data);
+                        this.isLoading = false;
                     }
                 })
             },
             async listenPropChange() {
                 this.offset = 0;
+                this.isLoading = true;
                 let res = await getShopList({
                     latitude: this.latitude,
                     longitude: this.longitude,
@@ -111,11 +155,18 @@
                 if (res.data.status == 1) {
                     this.shopList = [...res.data.data];
                     console.log(res.data);
+                    this.isLoading = false;
                 }
             },
         }
     }
 </script>
+
+<style lang="scss">
+    .shop-list .el-popover__reference {
+        display: flex;
+    }
+</style>
 
 <style lang="scss" scoped>
     @import "../../style/mixin";
@@ -179,7 +230,7 @@
                     .star-level {
                         position: relative;
                         height: 20px;
-                        width: 80px;
+                        /*width: 80px;*/
                         .star-dark{
                             position: absolute;
                             top: 0;
@@ -207,22 +258,6 @@
                     .icon-list {
                         margin-top: 5px;
 
-                        > i {
-                            display: inline-block;
-                            background: #fff;
-                            color: #999999;
-                            border: 1px solid;
-                            vertical-align: middle;
-                            font-style: normal;
-                            font-size: 12px;
-                            line-height: 16px;
-                            overflow: hidden;
-                            text-align: center;
-                            width: 18px;
-                            border-radius: 2px;
-                            margin-right: 3px;
-                            white-space: nowrap;
-                        }
                     }
                 }
             }
@@ -241,5 +276,81 @@
                 cursor: pointer;
             }
         }
+    }
+
+    /*商家详细信息 hover触发*/
+    .shop-hover{
+        .shop-detail{
+            display: flex;
+            flex-direction: column;
+            .detail-title{
+                font-size: 18px;
+                font-weight: bold;
+                padding: 5px 0;
+            }
+            .detail-type {
+                font-size: 12px;
+                color: $gray;
+                border-bottom: 1px solid $gray;
+                padding-bottom: 8px;
+            }
+            .detail-supports {
+                font-size: 12px;
+                color: #666;
+                >ul{
+                    padding-top: 5px;
+                    >li{
+                        padding:5px 0;
+                        display: flex;
+                    }
+                }
+            }
+            .detail-minite{
+                background-color: #eee;
+                color: #333;
+                display: flex;
+                padding: 8px 0;
+                margin: 10px 0;
+                .send-cost{
+                    flex: 1;
+                    text-align: center;
+                    font-size: 12px;
+                }
+                .distance{
+                    text-align: center;
+                    font-size: 12px;
+                    flex: 2;
+                    border-left: 2px solid #aaa;
+                    .distance-light{
+                        color:red;
+                    }
+                }
+            }
+            .detail-des{
+                font-size: 12px;
+                color: $gray;
+                padding-top: 10px;
+            }
+        }
+
+    }
+
+    /*商家支持icon样式*/
+    .support-icon{
+        display: inline-block;
+        background: #fff;
+        color: #999999;
+        border: 1px solid;
+        vertical-align: middle;
+        font-style: normal;
+        font-size: 12px;
+        line-height: 16px;
+        overflow: hidden;
+        text-align: center;
+        width: 18px;
+        height: 18px;
+        border-radius: 2px;
+        margin-right: 3px;
+        white-space: nowrap;
     }
 </style>
