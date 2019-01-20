@@ -133,7 +133,6 @@
                 }).then((res) => {
                     if (res.data.status == 1) {
                         this.shopList = [...res.data.data];
-                        console.log(res.data);
                         this.isLoading = false;
                     }
                 })
@@ -154,7 +153,6 @@
                 });
                 if (res.data.status == 1) {
                     this.shopList = [...res.data.data];
-                    console.log(res.data);
                     this.isLoading = false;
                 }
             },

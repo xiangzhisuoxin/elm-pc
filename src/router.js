@@ -4,6 +4,7 @@ import Router from 'vue-router'
 const Home = () => import('./views/Home/Home.vue')
 const Index = () => import('./views/Index/Index.vue')
 const Login = () => import('./views/Login/Login.vue');
+const test = () => import('./components/common/SearchResult');
 
 
 Vue.use(Router)
@@ -16,7 +17,7 @@ export default new Router({
             path: '/',
             name: 'home',
             component: Home
-            // component: Index
+            // component: test
             // component: Login
         },
         {

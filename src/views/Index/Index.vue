@@ -37,13 +37,29 @@
                         <span>[切换地址]</span>
                     </div>
                     <div class="search-food">
-                        <el-input  size="small" placeholder="请输入商家、美食...">
-                            <el-button slot="append" icon="el-icon-search"></el-button>
-                        </el-input>
+                        <el-col>
+                            <el-autocomplete
+                                    size="small"
+                                    class="inline-input"
+                                    v-model="searchShop"
+                                    :fetch-suggestions="getSearchHistory"
+                                    placeholder="请输入商家、美食..."
+                                    @select="selectSearchHistory"
+                            >
+                                <!--<el-button slot="append"
+                                           icon="el-icon-search"
+                                           @click="getSearchResult(searchShop)"
+                                ></el-button>-->
+                            </el-autocomplete>
+                            <el-button icon="el-icon-search"
+                                       size="small"
+                                       @click="getSearchResult(searchShop)"
+                            ></el-button>
+                        </el-col>
                     </div>
                 </div>
                 <!--商家分类-->
-                <div class="category">
+                <div class="category" v-if="!isShowSearchResult">
                     <div class="category-l">商家分类：</div>
                     <div class="category-r">
                         <ul class="clear food-type">
@@ -70,8 +86,12 @@
                            :deliveryMode="delivery_mode"
                            :confirmSelect="confirmStatus"
                            :supportIds="support_ids"
-                           v-if="latitude"
+                           v-if="latitude && !isShowSearchResult"
                 ></shop-list>
+                <search-result
+                        ref="searchResult"
+                        :keyword="searchShop"
+                        v-if="isShowSearchResult"></search-result>
             </div>
         </main>
     </div>
@@ -79,14 +99,16 @@
 
 <script>
     import {getFoodType, getDetailFoodType, getAddressInfo, cityGuess,getShopList} from '../../api/getData'
-    import {clickUtil} from '../../jsUtil/mUtils';
+    import {clickUtil, setStore, getStore} from '../../jsUtil/mUtils';
     import { mapState, mapMutations } from "vuex";
-    import ShopList from '../../components/common/ShopList'
+    import ShopList from '../../components/common/ShopList';
+    import SearchResult from '../../components/common/SearchResult'
 
     export default {
         name: "Index",
         components:{
-            ShopList
+            ShopList,
+            SearchResult,
         },
         data() {
             return{
@@ -104,6 +126,9 @@
                 confirmStatus: undefined,
                 support_ids: undefined,
                 delivery_mode: undefined,
+                searchShop: '',
+                searchHistory: [],//搜索历史
+                isShowSearchResult: false,
             }
         },
         async beforeMount() {
@@ -123,13 +148,17 @@
         methods:{
             ...mapMutations(['RECORD_ADDRESS']),
 
-            async initData(){
-                let res = await getDetailFoodType();
-                if (res.data.status == 1) {
-                    this.detailFoodTypeList = res.data.data;
-                    console.log(this.detailFoodTypeList);
-                }
+            initData(){
+                getDetailFoodType().then((res) => {
+                    if (res.data.status == 1) {
+                        this.detailFoodTypeList = res.data.data;
+                        console.log(this.detailFoodTypeList);
+                    }
+                });
 
+                if (getStore('search_food')) {
+                    this.searchHistory = JSON.parse(getStore('search_food'));
+                }
             },
             topLinkClick(index){
                 this.topActiveIndex = index;
@@ -182,6 +211,51 @@
                         this.restaurantCategoryIds = item.id || undefined;
                     }
                 })
+            },
+
+
+            /**
+             * 获取商家搜索输入框内容
+             * @param str 搜索框内容
+             * @param cb 渲染内容回调
+             */
+            getSearchHistory(str, cb) {
+                let arrHistory = this.searchHistory.map((item) => {
+                    return {"value": item}
+                });
+                cb(arrHistory);
+            },
+
+            /**
+             * 选择商家搜索输入框内容
+             * @param item 选中的项
+             */
+            selectSearchHistory(item){
+                this.getSearchResult(item.value);
+            },
+
+            /**
+             * 根据搜索内容获取商家列表
+             * @param searchStr
+             */
+            getSearchResult(searchStr){
+                //将搜索历史载入当地缓存
+                if (!this.searchHistory.includes(searchStr)) {
+                    this.searchHistory.push(searchStr);
+                    setStore('search_food', this.searchHistory);
+                }
+
+                //关键词不为空 打开搜索结果组件 否则关闭组件
+                if (searchStr) {
+                    //如果已经显示搜索结果组件，触发组件里的查询方法
+                    if (this.isShowSearchResult) {
+                        this.$refs.searchResult.initData();
+                    } else {
+                        this.isShowSearchResult = true;
+                    }
+                } else {
+                    this.isShowSearchResult = false;
+                }
             }
         },
 

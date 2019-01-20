@@ -5,7 +5,7 @@ import axios from 'axios';
  * @returns {*}
  */
 export const cityGuess = () => axios.get('/api/v1/cities', {
-    params:{
+    params: {
         type: 'guess'
     }
 });
@@ -15,7 +15,7 @@ export const cityGuess = () => axios.get('/api/v1/cities', {
  * @returns {*}
  */
 export const cityHot = () => axios.get('/api/v1/cities', {
-    params:{
+    params: {
         type: 'cityHot'
     }
 });
@@ -25,7 +25,7 @@ export const cityHot = () => axios.get('/api/v1/cities', {
  * @returns {*}
  */
 export const cityGroup = () => axios.get('/api/v1/cities', {
-    params:{
+    params: {
         type: 'cityGroup'
     }
 });
@@ -56,8 +56,8 @@ export const accountLogin = (username, password, captchaCode) => axios.post('/ap
  * @param keyword {String} 关键词
  * @returns {*}
  */
-export const getDetailPlace = (cityId,keyword) => axios.get('/api/v1/pois',{
-    params:{
+export const getDetailPlace = (cityId, keyword) => axios.get('/api/v1/pois', {
+    params: {
         cityId,
         keyword,
     }
@@ -98,7 +98,8 @@ export const getShopList = ({
                                 support_ids,
                                 restaurant_category_id,
                                 restaurant_category_ids,
-                            }) => axios.get('/api/v1/shopList',{params:{
+                            }) => axios.get('/api/v1/shopList', {
+    params: {
         latitude,
         longitude,
         offset,
@@ -108,16 +109,34 @@ export const getShopList = ({
         support_ids,
         restaurant_category_id,
         restaurant_category_ids,
-    }});
+    }
+});
 
 /**
  * 获取地址信息
  * @param geohash {String} 经纬度
  * @returns {*}
  */
-export const getAddressInfo = (geohash) => axios.get('/api/v1/addressInfo',{
-    params:{
+export const getAddressInfo = (geohash) => axios.get('/api/v1/addressInfo', {
+    params: {
         geohash
     }
 });
 
+/**
+ * 根据关键词搜索店铺
+ * @param latitude {String} 纬度
+ * @param longitude {String} 经度
+ * @param keyword {String} 关键词
+ * @returns {*}
+ */
+export const getShopsByKeyword = ({
+                                      latitude,
+                                      longitude,
+                                      keyword,
+                                  }) => axios.get('/api/v1/getShopsByKeyword', {
+                                      params:{
+                                          latitude,
+                                          longitude,
+                                          keyword,
+                                      }});
