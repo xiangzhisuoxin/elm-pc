@@ -2,7 +2,8 @@
     <div class="wrap">
         <!--搜索列表-->
         <div class="query-list">
-            <ul>
+            <loading v-if="isLoading"></loading>
+            <ul v-else>
                 <li v-for="(item,index) in shopList" :key="index">
                     <!--商家信息-->
                     <div class="list-item">
@@ -32,43 +33,34 @@
                         <!--商家食品信息-->
                         <div class="food-list">
                             <ul>
-                                <li>
+                                <li v-for="(food, index) in item.hotFood"
+                                    :key="index"
+                                    :class="{'hide': index > hotFoodNum}"
+                                >
                                     <div class="food-item">
-                                        <div class="food-name">麻辣鸡架（大份）</div>
-                                        <div class="food-cost">$10</div>
+                                        <div class="food-name">{{food.name}}</div>
+                                        <div class="food-cost">¥{{food.specfoods[0].price}}</div>
                                         <div class="food-status">可预订</div>
                                         <div class="food-rate">
                                             <div class="rate">
                                                 <el-rate
-                                                        v-model="rating"
+                                                        v-model="food.rating"
                                                         disabled
                                                         text-color="#ff9900">
                                                 </el-rate>
                                             </div>
-                                            <span>月售200份</span>
-                                        </div>
-                                    </div>
-                                </li>
-                                <li>
-                                    <div class="food-item">
-                                        <div class="food-name">麻辣鸡架（大份）</div>
-                                        <div class="food-cost">$10</div>
-                                        <div class="food-status">可预订</div>
-                                        <div class="food-rate">
-                                            <div class="rate">
-                                                <el-rate
-                                                        v-model="rating"
-                                                        disabled
-                                                        text-color="#ff9900">
-                                                </el-rate>
-                                            </div>
-                                            <span>月售200份</span>
+                                            <span>月售{{food.month_sales}}份</span>
                                         </div>
                                     </div>
                                 </li>
                             </ul>
-                            <div class="food-more">
-                                本商家还有<span class="light-orange">3</span>份相关美食，<span class="light-blue show-more-span">显示全部相关美食</span>
+                            <div class="food-more"
+                                 v-if="item.hotFood.length > 3"
+                            >
+                                本商家还有<span class="light-orange">{{item.hotFood.length - 3}}</span>份相关美食，
+                                <span class="light-blue show-more-span"
+                                      @click="showAllFood($event)"
+                                >显示全部相关美食</span>
                             </div>
                         </div>
                     </div>
@@ -93,6 +85,7 @@
             return {
                 isLoading: false,
                 rating:5,
+                hotFoodNum:2,
                 shopList: [],
             }
         },
@@ -105,17 +98,23 @@
         },
 
         methods:{
-            initData(){
+            initData(keyword = this.keyword){
+                this.isLoading = true;
                 getShopsByKeyword({
                     latitude: this.latitude,
                     longitude: this.longitude,
-                    keyword: this.keyword
+                    keyword
                 }).then((res) => {
                     if (res.data.status == 1) {
                         this.shopList = res.data.data;
                         console.log(this.shopList);
                     }
+                    this.isLoading = false;
                 })
+            },
+
+            showAllFood(e){
+                $(e.target).parents('.food-more').hide().parents('.food-list').find('li.hide').show();
             }
         }
     }

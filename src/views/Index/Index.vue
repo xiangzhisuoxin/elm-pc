@@ -249,7 +249,7 @@
                 if (searchStr) {
                     //如果已经显示搜索结果组件，触发组件里的查询方法
                     if (this.isShowSearchResult) {
-                        this.$refs.searchResult.initData();
+                        this.$refs.searchResult.initData(searchStr);
                     } else {
                         this.isShowSearchResult = true;
                     }
