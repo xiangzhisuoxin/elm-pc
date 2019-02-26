@@ -2,8 +2,11 @@
     <div class="shop-list">
         <loading v-if="isLoading"></loading>
         <ul class="clear">
-            <li v-for="(item, index) in shopList"
-                :key="index">
+            <router-link tag="li"
+                         v-for="(item, index) in shopList"
+                         :key="index"
+                         :to="{path: 'shop',query: {shopId: item.id}}"
+            >
                 <el-popover
                         placement="right"
                         width="250"
@@ -16,14 +19,16 @@
                             <div class="detail-supports">
                                 <ul>
                                     <li v-for="icon in item.supports">
-                                        <i class="support-icon" :style="'color:#'+icon.icon_color">{{icon.icon_name}}</i>
+                                        <i class="support-icon"
+                                           :style="'color:#'+icon.icon_color">{{icon.icon_name}}</i>
                                         <span>{{icon.description}}</span>
                                     </li>
                                 </ul>
                             </div>
                             <div class="detail-minite">
                                 <div class="send-cost">{{item.piecewise_agent_fee.tips}}</div>
-                                <div class="distance">平均 <span class="distance-light">{{item.order_lead_time}}</span>分钟到达</div>
+                                <div class="distance">平均 <span class="distance-light">{{item.order_lead_time}}</span>分钟到达
+                                </div>
                             </div>
                             <div class="detail-des">{{item.description}}</div>
                         </div>
@@ -61,13 +66,14 @@
                             </div>
                             <div class="delivery-cost">{{item.piecewise_agent_fee.tips}}</div>
                             <div class="icon-list">
-                                <i class="support-icon" v-for="icon in item.supports" :style="'color:#'+icon.icon_color">{{icon.icon_name}}</i>
+                                <i class="support-icon" v-for="(icon,index) in item.supports"
+                                   :style="'color:#'+icon.icon_color" :key="index">{{icon.icon_name}}</i>
                             </div>
                         </div>
                     </div>
                 </el-popover>
 
-            </li>
+            </router-link>
         </ul>
         <div class="more-login" v-if="!isLogin">查看更多商家，请先<span class="highlight">登录</span></div>
     </div>
@@ -80,7 +86,7 @@
 
     export default {
         name: "ShopList",
-        components:{
+        components: {
             Loading
         },
         data() {
@@ -229,19 +235,22 @@
                         position: relative;
                         height: 20px;
                         /*width: 80px;*/
-                        .star-dark{
+                        .star-dark {
                             position: absolute;
                             top: 0;
-                            >i::before{
+
+                            > i::before {
                                 color: #d1d1d1;
                             }
                         }
-                        .star-light{
+
+                        .star-light {
                             position: absolute;
                             top: 0;
                             white-space: nowrap;
                             overflow: hidden;
-                            >i::before{
+
+                            > i::before {
                                 color: #ff9a0d;
                             }
                         }
@@ -277,54 +286,64 @@
     }
 
     /*商家详细信息 hover触发*/
-    .shop-hover{
-        .shop-detail{
+    .shop-hover {
+        .shop-detail {
             display: flex;
             flex-direction: column;
-            .detail-title{
+
+            .detail-title {
                 font-size: 18px;
                 font-weight: bold;
                 padding: 5px 0;
             }
+
             .detail-type {
                 font-size: 12px;
                 color: $gray;
                 border-bottom: 1px solid $gray;
                 padding-bottom: 8px;
             }
+
             .detail-supports {
                 font-size: 12px;
                 color: #666;
-                >ul{
+
+                > ul {
                     padding-top: 5px;
-                    >li{
-                        padding:5px 0;
+
+                    > li {
+                        padding: 5px 0;
                         display: flex;
                     }
                 }
             }
-            .detail-minite{
+
+            .detail-minite {
                 background-color: #eee;
                 color: #333;
                 display: flex;
                 padding: 8px 0;
                 margin: 10px 0;
-                .send-cost{
+
+                .send-cost {
                     flex: 1;
                     text-align: center;
                     font-size: 12px;
                 }
-                .distance{
+
+                .distance {
                     text-align: center;
                     font-size: 12px;
                     flex: 2;
                     border-left: 2px solid #aaa;
-                    .distance-light{
-                        color:red;
+
+                    .distance-light {
+                        color: red;
                     }
                 }
             }
-            .detail-des{
+
+            .detail-des {
                 font-size: 12px;
                 color: $gray;
                 padding-top: 10px;
@@ -334,7 +353,7 @@
     }
 
     /*商家支持icon样式*/
-    .support-icon{
+    .support-icon {
         display: inline-block;
         background: #fff;
         color: #999999;

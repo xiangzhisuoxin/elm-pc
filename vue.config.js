@@ -47,7 +47,7 @@ module.exports = {
         // 设置代理
         proxy: {
             '/api': {
-                target: 'http://localhost:8002',
+                target: 'http://localhost:8003',
                 changeOrigin: true,//是否跨域
                 pathRewrite: {
                     '^/api': ''//需要rewrite重写

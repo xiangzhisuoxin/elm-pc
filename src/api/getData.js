@@ -89,16 +89,16 @@ export const getDetailFoodType = () => axios.get('/api/v1/getShopType');
  * @returns {*}
  */
 export const getShopList = ({
-                                latitude,
-                                longitude,
-                                offset = 0,
-                                limit = 20,
-                                order_by,
-                                delivery_mode,
-                                support_ids,
-                                restaurant_category_id,
-                                restaurant_category_ids,
-                            }) => axios.get('/api/v1/shopList', {
+    latitude,
+    longitude,
+    offset = 0,
+    limit = 20,
+    order_by,
+    delivery_mode,
+    support_ids,
+    restaurant_category_id,
+    restaurant_category_ids,
+}) => axios.get('/api/v1/shopList', {
     params: {
         latitude,
         longitude,
@@ -131,12 +131,56 @@ export const getAddressInfo = (geohash) => axios.get('/api/v1/addressInfo', {
  * @returns {*}
  */
 export const getShopsByKeyword = ({
-                                      latitude,
-                                      longitude,
-                                      keyword,
-                                  }) => axios.get('/api/v1/getShopsByKeyword', {
-                                      params:{
-                                          latitude,
-                                          longitude,
-                                          keyword,
-                                      }});
+    latitude,
+    longitude,
+    keyword,
+}) => axios.get('/api/v1/getShopsByKeyword', {
+    params: {
+        latitude,
+        longitude,
+        keyword,
+    }
+});
+
+/**
+ * 根据商家id获取商家信息
+ *
+ * @param {*} {
+ *     resId,
+ *     latitude,
+ *     longitude,
+ * }
+ */
+export const getShopById= ({
+    resId,
+    latitude,
+    longitude,
+}) => axios.get('/api/v1/getShopById', {
+    params: {
+        resId,
+        latitude,
+        longitude
+    }
+})
+
+/**
+ * 根据商家id获取商家食品列表
+ * @param {*} param0 
+ */
+export const getMenuByShopId = ({
+    resId
+}) => axios.get('/api/v1/getMenuByShopId',{
+    params:{
+        resId
+    }
+})
+
+/**
+ * 根据商家id获取商家评论
+ * @param {*} param0 
+ */
+export const getRatingByShopId = ({
+    resId
+}) => axios.get('/api/v1/getRatingByShopId',{
+    params:{resId}
+});

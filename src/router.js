@@ -4,7 +4,9 @@ import Router from 'vue-router'
 const Home = () => import('./views/Home/Home.vue')
 const Index = () => import('./views/Index/Index.vue')
 const Login = () => import('./views/Login/Login.vue');
-const test = () => import('./components/common/SearchResult');
+const Shop = () => import('./views/Shop/Shop.vue');
+// const test = () => import('./components/common/SearchResult');
+const test = () => import('./components/common/Rating');
 
 
 Vue.use(Router)
@@ -16,9 +18,9 @@ export default new Router({
         {
             path: '/',
             name: 'home',
-            component: Home
-            // component: test
-            // component: Login
+            // component: Home
+            component: test
+            // component: Shop
         },
         {
             path: '/login',
@@ -28,6 +30,10 @@ export default new Router({
         {
             path: '/index',
             component: Index,
+        },
+        {
+            path: '/shop',
+            component: Shop,
         },
         {
             path: '/about',
