@@ -1,61 +1,68 @@
 <template>
-  <div class="shop-wrap">
-    <div class="food-type">
-      <ul class="clear">
-        <li v-for="(item, index) in menuList" :key="index">{{item.name}}</li>
-      </ul>
-    </div>
-    <div class="food-list">
-      <ul class="clear">
-        <li v-for="(item, index) in menuList" :key="index">
-          <div class="food-item">
-            <div class="food-title">
-              <span class="food-type">{{item.name}}</span>
-              <small class="food-des">{{item.description}}</small>
+  <div>
+    <loading v-if="isLoading"></loading>
+    <div v-else class="shop-wrap">
+      <div class="food-type">
+        <ul class="clear">
+          <li v-for="(item, index) in menuList" :key="index">{{item.name}}</li>
+        </ul>
+      </div>
+      <div class="food-list">
+        <ul class="clear">
+          <li v-for="(item, index) in menuList" :key="index">
+            <div class="food-item">
+              <div class="food-title">
+                <span class="food-type">{{item.name}}</span>
+                <small class="food-des">{{item.description}}</small>
+              </div>
+              <div class="food-col">
+                <ul class="clear">
+                  <li v-for="(food, index) in item.foods" :key="index">
+                    <div class="item">
+                      <div class="item-l">
+                        <img src="../../assets/food.webp" alt>
+                      </div>
+                      <div class="item-m">
+                        <span class="m-name">{{food.name}}</span>
+                        <span class="m-des">{{food.description}}</span>
+                        <el-rate v-model="food.rating" disabled show-score text-color="#ff9900"></el-rate>
+                        <span
+                          v-if="food.specfoods.length == 1"
+                          class="m-cost"
+                        >¥{{food.specfoods[0].price}}</span>
+                        <span v-else class="m-cost">
+                          {{getMinPrice(food.specfoods)}}
+                          <span class="m-cost-min">起</span>
+                        </span>
+                      </div>
+                      <div class="item-r">
+                        <el-button v-if="food.specfoods.length == 1" type="primary" round>选规格</el-button>
+                        <el-button v-else type="primary" round>加入购物车</el-button>
+                      </div>
+                    </div>
+                  </li>
+                </ul>
+              </div>
             </div>
-            <div class="food-col">
-              <ul class="clear">
-                <li v-for="(food, index) in item.foods" :key="index">
-                  <div class="item">
-                    <div class="item-l">
-                      <img src="../../assets/food.webp" alt>
-                    </div>
-                    <div class="item-m">
-                      <span class="m-name">{{food.name}}</span>
-                      <span class="m-des">{{food.description}}</span>
-                      <el-rate v-model="food.rating" disabled show-score text-color="#ff9900"></el-rate>
-                      <span
-                        v-if="food.specfoods.length == 1"
-                        class="m-cost"
-                      >¥{{food.specfoods[0].price}}</span>
-                      <span v-else class="m-cost">
-                        {{getMinPrice(food.specfoods)}}
-                        <span class="m-cost-min">起</span>
-                      </span>
-                    </div>
-                    <div class="item-r">
-                      <el-button v-if="food.specfoods.length == 1" type="primary" round>选规格</el-button>
-                      <el-button v-else type="primary" round>加入购物车</el-button>
-                    </div>
-                  </div>
-                </li>
-              </ul>
-            </div>
-          </div>
-        </li>
-      </ul>
+          </li>
+        </ul>
+      </div>
     </div>
   </div>
 </template>
 
 <script>
+import Loading from '../Loading'
 import {getMenuByShopId } from "../../api/getData";
 export default {
   name: "",
-  components: {},
+  components: {
+    Loading
+  },
   data() {
     return {
-      menuList: []
+      menuList: [],
+      isLoading:true,
     };
   },
   props: ["resId"],
@@ -75,6 +82,7 @@ export default {
         if (res.data.status == 1) {
           this.menuList = res.data.data;
           console.log(res.data.data);
+          this.isLoading = false;
         }
       });
     },

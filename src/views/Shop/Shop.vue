@@ -34,7 +34,7 @@
     <main>
       <!--主要部分头部-->
       <div class="main-nav">
-        <ul class="nav-tab">
+        <ul class="nav-tab" @click="navTabClick($event)">
           <li class="nav-tab-active">所有商品</li>
           <li>评价</li>
           <li>商家资质</li>
@@ -54,9 +54,9 @@
       <div class="main-con">
         <div class="main-left">
           <!--所有商品tab页-->
-          <menu-list :resId="1"></menu-list>
+          <menu-list v-if="tabIndex==0" :resId="1"></menu-list>
           <!-- 评价页 -->
-          <div class="rating"></div>
+          <rating v-if="tabIndex==1"></rating>
         </div>
         <div class="main-right">
           <div class="shop-ad">
@@ -91,7 +91,9 @@
 import MyHeader from "../../components/Header/Header";
 import MyFooter from "../../components/Footer/MyFooter";
 import MenuList from "../../components/common/MenuList";
+import Rating from "../../components/common/Rating";
 import { getShopById, getMenuByShopId } from "../../api/getData";
+import {clickUtil} from '../../jsUtil/mUtils'
 import { mapState, mapMutations } from "vuex";
 
 export default {
@@ -99,14 +101,16 @@ export default {
   components: {
     MyHeader,
     MyFooter,
-    MenuList
+    MenuList,
+     Rating
   },
   data() {
     return {
       rating: 5,
       imgBac:
         "url(//shadow.elemecdn.com/faas/desktop/media/img/shop-bg.0391dd.jpg) no-repeat",
-      shopInfo: {}
+      shopInfo: {},
+      tabIndex:0,
     };
   },
   computed: {
@@ -120,17 +124,6 @@ export default {
      * 初始化数据
      */
     async initData() {
-      // getShopById({
-      //     resId:1,
-      //     latitude:23.12497,
-      //     longitude:113.26308
-      // }).then((res) => {
-      //     if(res.data.status == 1){
-      //         if(res.data.data.length){
-      //             this.shopInfo = res.data.data[0];
-      //         }
-      //     };
-      // });
       let res = await getShopById({
         resId: 1,
         latitude: 23.12497,
@@ -142,7 +135,18 @@ export default {
         }
         
       }
-    }
+    },
+    navTabClick(e){
+      clickUtil({
+        el:e.target,
+        target:'li',
+        callback:(el) => {
+          $(el).siblings('li').removeClass('nav-tab-active');
+          $(el).addClass('nav-tab-active')
+          this.tabIndex = $(el).index();
+        }
+      })
+    },
   }
 };
 </script>
