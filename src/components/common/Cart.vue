@@ -8,22 +8,34 @@
       <ul>
         <li>
           <div class="cart-item">
-            <span>鲜嫩小红腰</span>
+            <span class="food-name">鲜嫩小红腰</span>
             <div class="num">
-              <el-input-number size="mini" v-model="num7"></el-input-number>
+              <el-input-number size="mini" v-model="num"></el-input-number>
             </div>
-            <span>¥2.5</span>
+            <span class="food-cost">¥2.5</span>
+          </div>
+        </li>
+        <li>
+          <div class="cart-item">
+            <span class="food-name">鲜嫩小红腰</span>
+            <div class="num">
+              <el-input-number size="mini" v-model="num"></el-input-number>
+            </div>
+            <span class="food-cost">¥2.5</span>
           </div>
         </li>
       </ul>
     </div>
     <div class="cart-sum">
       <div class="sum-l">
-        <img src="" alt="">
-        <span></span>
+        <div class="car">
+          <div class="pop-num">1</div>
+          <i class="el-icon-tickets"></i>¥<span class="cost-all">0</span>
+        </div>
+        <span class="delivary-cost">配送费¥2</span>
       </div>
       <div class="sum-r">
-        
+        购物车为空
       </div>
     </div>
   </div>
@@ -33,11 +45,11 @@
 export default {
   data () {
     return {
+      num:0
     };
   },
 
   components: {
-    CartItem,
   },
 
   computed: {},
@@ -59,9 +71,111 @@ export default {
   .cart-title{
     padding:10px;
     font-size: 14px;
+    border-bottom: 1px solid #eee;
     .clear{
       color:#0089dc;
+      cursor: pointer;
     }
+  }
+  .cart-list{
+    .cart-item{
+      display: flex;
+      font-size: 14px;
+      align-items: center;
+      padding: 8px 10px;
+      border-bottom: 1px solid #eee;
+      &:hover{
+        background-color: #F5F5F5;
+      }
+      .num,
+      .food-cost{
+        text-align: right;
+      }
+      .num{
+        flex:3;
+      }
+      .food-name{
+        color:#666;
+      }
+      .food-cost{
+        color: #f17530;
+        flex:2;
+      }
+    }
+  }
+  .cart-sum{
+    display: flex;
+    height: 50px;
+    .sum-l{
+      flex:4;
+      display: flex;
+      background-color: #2c2c2c;
+      align-items: center;
+          padding: 0 10px;
+      .car{
+        font-size: 14px;
+        color: #fff;  
+        position: relative;
+        .pop-num{
+          position: absolute;
+          top: -6px;
+          left: 22px;
+          height: 16px;
+          line-height: 14px;
+          min-width: 16px;
+          border-radius: 50%;
+          font-size: 12px;
+          text-align: center;
+          background-color: #ff2828;
+          color: #fff;
+          font-weight: 700;
+        }
+        >i{
+          color: #fff;
+          font-size: 26px;
+          margin-right: 4px;
+        }
+        .cost-all{
+          font-size: 20px;
+          color:#fff;
+        }
+      }
+      .delivary-cost{
+        font-size: 12px;
+        border-left: 1px solid #555;
+        margin-left: 2px;
+        padding-left: 6px;
+        color: #999;
+      }
+    }
+    .sum-r{
+      flex:3;
+      display: flex;
+      align-items: center;
+      background-color: #e4e4e4;
+      color: #333;
+      justify-content: center;
+      font-weight: 700;
+    }
+  }
+}
+</style>
+<style lang="scss">
+.cart-item{
+  .el-input-number--mini{
+    width: 65px;
+    line-height: 18px;
+  }
+  .el-input-number--mini .el-input-number__decrease, .el-input-number--mini .el-input-number__increase{
+    width: 20px;
+  }
+  .el-input-number--mini .el-input__inner{
+    padding-left: 5px;
+    padding-right: 5px;
+  }
+  .el-input--mini .el-input__inner{
+    height: 20px;
+    line-height: 20px;
   }
 }
 </style>
