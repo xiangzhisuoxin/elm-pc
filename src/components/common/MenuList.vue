@@ -35,9 +35,57 @@
                           <span class="m-cost-min">起</span>
                         </span>
                       </div>
+                      <!-- 右侧加入购物车 -->
                       <div class="item-r">
-                        <el-button v-if="food.specfoods.length == 1" type="primary" round>选规格</el-button>
-                        <el-button v-else type="primary" round>加入购物车</el-button>
+                        <div class="item-r-b" v-if="!getFood(food.item_id)">
+                          <el-button
+                            v-if="food.specfoods.length == 1"
+                            type="primary"
+                            @click="addToCart({id:food.item_id,name:food.name,price:food.specfoods[0].price,firstAdd:true})"
+                            round
+                          >加入购物车</el-button>
+                          <el-popover
+                            v-else
+                            placement="right"
+                            width="300"
+                            :popIndex="index"
+                            :value="popIndex == index"
+                            @show="showPop(index)"
+                            trigger="click">
+                            <div class="type">
+                              <div class="top">
+                                <div class="top-title">规格</div>
+                                <div class="type-list">
+                                  <el-button
+                                   size="mini" 
+                                   round 
+                                   v-for="(type, specIndex) in food.specfoods" 
+                                   :autofocus="typeIndex == specIndex"
+                                   @click="foodTypeClick(specIndex)"
+                                   :key="specIndex">{{type.specs_name ==''? '默认': type.specs_name}}</el-button>
+                                </div>
+                              </div>
+                              <div class="choose-info">
+                                <span>已选：默认</span>
+                                <div class="cost">¥{{food.specfoods[typeIndex].price || 20}}</div>
+                              </div>
+                              <div class="add-btn">
+                                <el-button type="primary" 
+                                @click="popAddToCart({
+                                  id:food.specfoods[typeIndex].item_id,
+                                  name:food.specfoods[typeIndex].name,
+                                  specs_name:food.specfoods[typeIndex].specs_name,
+                                  price:food.specfoods[typeIndex].price
+                                  })">选好了，加入购物车</el-button>
+                                <span @click="popAddToCart({no:true})">不要啦</span>
+                              </div>
+                            </div>
+                            <el-button slot="reference" type="primary" @click="chooseType" round>选规格</el-button>
+                          </el-popover>
+                        </div>
+                        <el-input-number v-else size="mini" v-model="getFood(food.item_id).num"></el-input-number>
+                        <!-- <el-input-number v-else size="mini" v-model="orderList.find(item=>{return item.id==food.item_id}).num"></el-input-number> -->
+                        <!-- <el-input-number v-else size="mini" v-model="a"></el-input-number> -->
                       </div>
                     </div>
                   </li>
@@ -47,26 +95,48 @@
           </li>
         </ul>
       </div>
+      <!-- 购物车 -->
+      <div class="cart">
+        <cart :resId="resId" :orderList="orderList"></cart>
+      </div>
     </div>
   </div>
 </template>
 
 <script>
-import Loading from '../Loading'
-import {getMenuByShopId } from "../../api/getData";
+import Loading from "../Loading";
+import Cart from "./Cart";
+import { getMenuByShopId } from "../../api/getData";
 export default {
   name: "",
   components: {
-    Loading
+    Loading,
+    Cart
   },
   data() {
     return {
       menuList: [],
-      isLoading:true,
+      isLoading: true,
+      orderList: [],
+      popIndex:-1,
+      typeIndex:0,/* 默认选择第一个 */
     };
   },
   props: ["resId"],
-  computed: {},
+  computed: {
+    a() {
+      return 1;
+    }
+    // getFood(){
+    //   return (id) => {
+    //     this.orderList.find(item => {
+    //       if(item.id == id) {
+    //         return item.num >0
+    //       }
+    //     })
+    //   }
+    // },
+  },
   mounted() {
     this.initData();
   },
@@ -97,6 +167,61 @@ export default {
         }
       });
       return minPrice;
+    },
+    /**
+     * 添加到购物车
+     * id 商品id
+     * price 商品价格
+     * firstAdd 0-1
+     */
+    addToCart({ id, price, firstAdd, name }) {
+      let isIn = false;
+      this.orderList.find(item => {
+        if (item.id == id) {
+          item.num++;
+          isIn = true;
+          return true;
+        }
+      });
+      if (!isIn) {
+        this.orderList.push({ id, num: 1, price, name });
+      }
+    },
+
+    /**
+     * 选规格
+     */
+    chooseType() {},
+    getFood(id) {
+      return this.orderList.find(item => {
+        if (item.id == id) {
+          return item.num > 0;
+        }
+      });
+    },
+    /**
+     * 显示多规格弹窗
+     * index pop弹窗的索引
+     */
+    showPop(index){
+      this.popIndex = index;
+      this.typeIndex = 0;
+    },
+    /**
+     * 多规格弹窗添加到购物车按钮
+     */
+    popAddToCart({no=false,id,name,price}){
+      this.popIndex = -1;
+      if(no) {
+        return;
+      }
+      this.addToCart({id,name,price})
+    },
+    /**
+     * 多规格食物按钮点击事件
+     */
+    foodTypeClick(index){
+      this.typeIndex = index;
     }
   }
 };
@@ -231,7 +356,78 @@ export default {
       }
     }
   }
+  .cart {
+    position: fixed;
+    right: 0;
+    bottom: 0;
+  }
+}
+// 选规格弹出的弹窗
+.type {
+  display: flex;
+  flex-direction: column;
+  background-color: #fcfcfc;
+  .top {
+    display: flex;
+    flex-direction: column;
+    padding: 10px;
+    border: 1px solid #eee;
+    .top-title {
+      font-size: 14px;
+      padding-bottom: 10px;
+      color: #666;
+      margin-left: 8px;
+    }
+  }
+  .choose-info {
+    font-size: 14px;
+    color: #666;
+    line-height: 23px;
+    padding: 5px 0;
+    .cost {
+      font-size: 16px;
+      font-weight: 700;
+      color: #ff6000;
+    }
+  }
+  .add-btn{
+    display: flex;
+    /deep/ .el-button{
+      flex:3;
+      >span{
+        color:#fff;
+      }
+    }
+    >span{
+      flex:2;
+      text-align: center;
+      cursor: pointer;
+      color:#aaa;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+  }
 }
 </style>
+
 <style lang="scss">
+.item-r {
+  .el-input-number--mini {
+    width: 65px;
+    line-height: 18px;
+  }
+  .el-input-number--mini .el-input-number__decrease,
+  .el-input-number--mini .el-input-number__increase {
+    width: 20px;
+  }
+  .el-input-number--mini .el-input__inner {
+    padding-left: 5px;
+    padding-right: 5px;
+  }
+  .el-input--mini .el-input__inner {
+    height: 20px;
+    line-height: 20px;
+  }
+}
 </style>

@@ -5,8 +5,8 @@ const Home = () => import('./views/Home/Home.vue')
 const Index = () => import('./views/Index/Index.vue')
 const Login = () => import('./views/Login/Login.vue');
 const Shop = () => import('./views/Shop/Shop.vue');
-// const test = () => import('./components/common/SearchResult');
-const test = () => import('./components/common/Cart');
+const dev = () => import('./views/User/User.vue');
+const Test = () => import('./components/Test');
 
 
 Vue.use(Router)
@@ -19,7 +19,7 @@ export default new Router({
             path: '/',
             name: 'home',
             // component: Home
-            component: test
+            component: dev
             // component: Shop
         },
         {
