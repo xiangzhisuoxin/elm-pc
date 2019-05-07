@@ -10,7 +10,7 @@
                     <div class="current-place">
                         <span>当前位置：</span>
                         <span>玉龙小区</span>
-                        <span>[切换地址]</span>
+                        <router-link tag="span" :to="{path:'/'}">[切换地址]</router-link>
                     </div>
                     <div class="search-food">
                         <el-col>
@@ -39,12 +39,11 @@
                     <div class="category-l">商家分类：</div>
                     <div class="category-r">
                         <ul class="clear food-type">
-                            <!--<li class="food-type-active" @click="foodTypeClick($event)">全部商家</li>-->
+                            <!-- <li class="food-type-active" @click="foodTypeClick($event)">全部商家</li> -->
                             <!--<li v-for="item in foodTypeList" @click="foodTypeClick($event)">{{item.title}}</li>-->
                             <li v-for="(item, index) in detailFoodTypeList"
                                 @click="foodTypeClick($event,item, index)"
                                 :key="index"
-                                :class="{'food-type-active': index == 0}"
                             >{{item.name}}</li>
                         </ul>
                         <ul class="type-detail clear" v-if="isShowTypeDetail">

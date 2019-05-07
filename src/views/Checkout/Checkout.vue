@@ -33,22 +33,23 @@
             </li>
           </ul>
           <ul class="list">
-            <li>
-              <span>1</span>
-              <span>1</span>
-              <span>1</span>
+            <li v-for="(item, index) in orderList" :key="index">
+              <span>{{item.name}}</span>
+              <span>{{item.num}}</span>
+              <span>¥{{item.price*item.num}}</span>
             </li>
           </ul>
           <ul class="other">
             <li>
-              <span>1</span>
-              <span>1</span>
-              <span>1</span>
+              <span>配送费</span>
+              <span></span>
+              <span>{{deliveryFee}}</span>
             </li>
           </ul>
         </div>
         <div class="sum">
-          <span>¥</span>39.00
+          <span>¥</span>
+          {{totalCost}}
         </div>
       </section>
       <!-- 右侧表单提交 -->
@@ -56,19 +57,23 @@
         <div class="info address">
           <div class="info-title">
             <span class="name">收货地址</span>
-            <span class="link">添加新地址</span>
+            <!-- <span class="link">添加新地址</span> -->
           </div>
           <div class="address-list">
-            <ul>
-              <li>
+            <ul v-if="addressOne">
+              <li
+                v-for="(item, index) in addressOne.slice(0,3)"
+                :key="index"
+                :class="{'address-list-active':index == 0}"
+              >
                 <i class="el-icon-location-outline"></i>
                 <div class="detail">
-                  <span class="person">deng</span>
-                  <span class="addr">yulong</span>
+                  <span class="person">{{`${item.name} ${item.sex==1?'先生':'女士'} ${item.phone}`}}</span>
+                  <span class="addr">{{`${item.address} ${item.address_detail}`}}</span>
                 </div>
               </li>
             </ul>
-            <div class="show-more">显示更多地址</div>
+            <div v-if="addressOne&&addressOne.length>3" class="show-more">显示更多地址</div>
           </div>
         </div>
         <div class="info check">
@@ -98,27 +103,131 @@
             </div>
           </div>
         </div>
-        <el-button type="danger">确认下单</el-button>
+        <el-button type="danger" @click="isShowBuyDialog=true">确认下单</el-button>
+      </section>
+
+      <!-- 确认下单弹窗 -->
+      <section>
+        <el-dialog title="下单提示" :visible.sync="isShowBuyDialog" width="30%">
+          <span>您确定下单吗</span>
+          <span slot="footer" class="dialog-footer">
+            <el-button @click="isShowBuyDialog = false">取 消</el-button>
+            <el-button type="primary" @click="buy">确 定</el-button>
+          </span>
+        </el-dialog>
       </section>
     </div>
   </div>
 </template>
 
 <script>
+import { mapState } from "vuex";
+import gql from "graphql-tag";
 export default {
   data() {
     return {
-      remark: ""
+      remark: "",
+      orderList: [],
+      deliveryFee: 0,
+      userId: 0,
+      shopId: 0,
+      shopName: "",
+      addressId: 0,
+      // addressList,
+      isShowBuyDialog: false
     };
   },
 
   components: {},
 
-  computed: {},
+  computed: {
+    ...mapState(["userInfo", "shopDetail"]),
+    totalCost() {
+      let cost = 0;
+      this.orderList.forEach(item => {
+        cost += item.num * item.price;
+      });
+      cost += +this.deliveryFee;
+      return cost;
+    }
+  },
+  created() {
+    this.orderList = this.$route.query.orderList;
+    this.deliveryFee = this.$route.query.deliveryFee;
+    if (!Array.isArray(this.orderList)) {
+      this.orderList = [];
+    }
+  },
+  apollo: {
+    addressOne: {
+      query() {
+        return gql`{
+          addressOne(userId:${this.userId}){
+            name,
+            sex,
+            phone,
+            address,
+            address_detail
+          }
+        }`;
+      }
+    }
+  },
+  mounted() {
+    if (this.userInfo) {
+      this.userId = this.userInfo.userId;
+    }
+  },
 
-  mounted() {},
+  methods: {
+    async buy() {
+      this.isShowBuyDialog = false;
+      let cart = [];
+      this.orderList.forEach(item => {
+        cart.push({
+          name: item.name,
+          quantity: item.num,
+          price: item.price
+        });
+      });
 
-  methods: {}
+      //做的很粗糙 不知道怎么写 json转字符串 怎么去掉key的"?
+      let cartText=[]
+      cart.forEach((item => {
+        let text = `{name:"${item.name}"},{quantity:${item.quantity}},{price:${item.price}}`;
+        cartText.push(text);
+      }));
+      cartText=`[${cartText.join(',')}]`;
+      let tem = gql`mutation{
+                      orderAdd(
+                        shopId:${this.shopDetail.shopId},
+                        shopName:"${this.shopDetail.shopName}",
+                        userId:${this.userInfo.userId},
+                        addressId:${this.addressId},
+                        orderTime:"${new Date().getTime()}",
+                        deliveryFee:{price:${this.deliveryFee}},
+                        totalCost:10,
+                        cart:${cartText}
+                      ){
+
+                        user_id
+                      }
+                    }`;
+      this.$apollo.mutate({
+        mutation:tem
+      }).then(() => {
+        this.$message({
+          message: '下单成功',
+          type: 'success'
+        });
+        setTimeout(() => {
+          this.$router.push({ path: "/index" });
+        }, 3000);
+      }).catch(() => {
+        this.$message.error("下单失败");
+      })
+    }
+  }
 };
 </script>
 <style lang='scss' scoped>
@@ -127,13 +236,13 @@ export default {
     .top {
       height: 30px;
       background-color: #0089dc;
-      border-bottom: 1px solid #027ecb;;
-      padding:0 40px;
+      border-bottom: 1px solid #027ecb;
+      padding: 0 40px;
       display: flex;
       align-items: center;
-      .position{
+      .position {
         font-size: 12px;
-        color:#fff;
+        color: #fff;
       }
     }
     .header-con {
@@ -274,6 +383,12 @@ export default {
               padding: 10px;
               align-items: center;
               border-bottom: 1px solid #eee;
+              cursor: pointer;
+              &.address-list-active {
+                border: 1px solid #0089dc;
+                background: url("../../assets/icon-check.png") right bottom
+                  no-repeat;
+              }
               > i {
                 border-right: 1px solid #eee;
                 font-size: 30px;

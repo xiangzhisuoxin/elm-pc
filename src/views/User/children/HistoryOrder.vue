@@ -6,17 +6,17 @@
       <span class="all-list">查看所有订单</span>
     </div>
     <div class="order-list">
-      <ul>
-        <li>
+      <ul v-if="orderList">
+        <li v-for="(item, index) in orderList" :key="index">
           <img class="res-picture" src="../../../assets/shop.webp" alt>
           <div class="order-info">
-            <span class="order-name">回味王麻辣烫麻辣香锅(友谊店)</span>
-            <span class="order-detail">麻辣香锅一一微辣1份 / 麻辣香锅午餐肉双人餐＋矿泉水2瓶1份</span>
-            <span class="order-num">共2个菜品></span>
+            <span class="order-name">{{item.restaurant_name}}</span>
+            <span class="order-detail">{{parseBasket(item.basket.group[0])}}</span>
+            <span class="order-num">共{{item.basket.group[0].length}}个菜品></span>
           </div>
-          <div class="order-time">2019-03-23 10:42</div>
-          <div class="order-cost">¥13.40</div>
-          <div class="order-state">订单已完成</div>
+          <div class="order-time">{{item.formatted_created_at}}</div>
+          <div class="order-cost">{{item.total_amount}}¥</div>
+          <div class="order-state">支付成功</div>
         </li>
       </ul>
     </div>
@@ -24,18 +24,80 @@
 </template>
 
 <script>
+import { mapState } from "vuex";
+import gql from "graphql-tag";
+import _ from "lodash";
+
 export default {
   data() {
-    return {};
+    return {
+      userId: -1,
+      orderList: undefined
+    };
   },
 
   components: {},
 
-  computed: {},
+  computed: {
+    ...mapState(["userInfo"])
+  },
 
-  mounted() {},
+  apollo: {
+    orderOne() {
+      return gql`{
+          orderOne(userId: ${this.userId}) {
+            restaurant_name
+            formatted_created_at
+            total_amount
+            status_bar {
+              color
+              sub_title
+              title
+            }
+            basket {
+              packing_fee {
+                price
+                quantity
+                name
+              }
+              group {
+                name
+                price
+                quantity
+              }
+            }
+          }
+        }
+      `;
+    }
+  },
+  watch: {
+    orderOne(val) {
+      // this.orderList = _.flatten(val.order.basket.group);
+      this.orderList = val;
+    }
+  },
 
-  methods: {}
+  mounted() {
+    this.initData();
+  },
+
+  methods: {
+    initData() {
+      if (this.userInfo) {
+        this.userId = this.userInfo.userId;
+      }
+    },
+    parseBasket(arr=[]) {
+      let text = [];
+      if (arr&&arr.length) {
+        text = _.map(arr, item => {
+          return item.name + "*" + item.quantity;
+        });
+      }
+      return text.join(",");
+    }
+  }
 };
 </script>
 <style lang='scss' scoped>
@@ -80,11 +142,11 @@ export default {
           display: flex;
           flex: 4;
           flex-direction: column;
-              align-items: flex-start;
-              padding-left: 10px;
-              overflow: hidden;
-              text-overflow: ellipsis;
-              
+          align-items: flex-start;
+          padding-left: 10px;
+          overflow: hidden;
+          text-overflow: ellipsis;
+
           .order-name {
             font-size: 16px;
             font-weight: 700;
@@ -93,23 +155,23 @@ export default {
           .order-detail {
             margin: 6px 0;
             color: #999;
-            font-size:12px; 
+            font-size: 12px;
           }
           .order-num {
-            font-size:12px; 
+            font-size: 12px;
             margin: 6px 0;
             color: #999;
           }
         }
-        .order-time{
-          color:#666;
-          font-size: 12px;  
+        .order-time {
+          color: #666;
+          font-size: 12px;
         }
-        .order-cost{
+        .order-cost {
           font-size: 16px;
         }
-        .order-state{
-          color:#666;
+        .order-state {
+          color: #666;
         }
       }
     }

@@ -37,13 +37,13 @@
         <ul class="nav-tab" @click="navTabClick($event)">
           <li class="nav-tab-active">所有商品</li>
           <li>评价</li>
-          <li>商家资质</li>
+          <!-- <li>商家资质</li> -->
         </ul>
         <ul class="nav-sort">
           <li class="nav-sort-active">默认排序</li>
-          <li>评分</li>
-          <li>销量</li>
-          <li>价格</li>
+          <!-- <li>评分</li> -->
+          <!-- <li>销量</li> -->
+          <!-- <li>价格</li> -->
         </ul>
         <div class="nav-btn">
           <span></span>
@@ -54,7 +54,7 @@
       <div class="main-con">
         <div class="main-left">
           <!--所有商品tab页-->
-          <menu-list v-if="tabIndex==0" :resId="1"></menu-list>
+          <menu-list v-if="tabIndex==0" :resId="resId" :deliveryFee="shopInfo.float_delivery_fee"></menu-list>
           <!-- 评价页 -->
           <rating v-if="tabIndex==1"></rating>
         </div>
@@ -93,7 +93,7 @@ import MyFooter from "../../components/Footer/MyFooter";
 import MenuList from "../../components/common/MenuList";
 import Rating from "../../components/common/Rating";
 import { getShopById, getMenuByShopId } from "../../api/getData";
-import {clickUtil} from '../../jsUtil/mUtils'
+import {clickUtil} from '../../jsUtil/mUtils';
 import { mapState, mapMutations } from "vuex";
 
 export default {
@@ -102,7 +102,7 @@ export default {
     MyHeader,
     MyFooter,
     MenuList,
-     Rating
+    Rating
   },
   data() {
     return {
@@ -111,29 +111,42 @@ export default {
         "url(//shadow.elemecdn.com/faas/desktop/media/img/shop-bg.0391dd.jpg) no-repeat",
       shopInfo: {},
       tabIndex:0,
+      resId:0,
     };
   },
   computed: {
-    ...mapState(["latitude", "longitude"])
+    ...mapState(["latitude", "longitude",'shopDetail'])
+  },
+  beforeMount(){
+    this.resId=this.$route.query.shopId;
+    //重置浏览的商家信息
+    if(this.shopDetail){
+
+    }
   },
   mounted() {
     this.initData();
   },
   methods: {
+    ...mapMutations(['RECORD_SHOPINFO']),
     /**
      * 初始化数据
      */
     async initData() {
+
       let res = await getShopById({
-        resId: 1,
+        resId: +this.resId,
         latitude: 23.12497,
         longitude: 113.26308
       });
       if (res.data.status == 1) {
         if (res.data.data.length) {
           this.shopInfo = res.data.data[0];
+          this.RECORD_SHOPINFO({
+            shopId:this.shopInfo.id,
+            shopName:this.shopInfo.name
+          });
         }
-        
       }
     },
     navTabClick(e){

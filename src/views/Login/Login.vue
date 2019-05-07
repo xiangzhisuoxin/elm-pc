@@ -62,7 +62,7 @@
                             case 1:
                                 alert('登录成功');
                                 this.RECORD_USERINFO(res.data.data.userInfo);
-                                // this.$router.go(-1);
+                                this.$router.go(-1);
                                 break;
                             case 2:
                                 alert('验证码错误');

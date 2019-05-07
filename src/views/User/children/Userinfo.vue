@@ -5,26 +5,26 @@
       <div class="avator">
         <i class="fa fa-user-circle-o"></i>
         <div class="info">
-          <div class="name">邓</div>
+          <div class="name">{{username}}</div>
           <span class="des">你好</span>
         </div>
       </div>
       <div class="red-envelope">
         <span>我的红包</span>
         <span class="num">
-          0
+          {{discountNum}}
           <span>个</span>
         </span>
       </div>
       <div class="coin">
-        <span>我的红包</span>
+        <span>我的金币</span>
         <span class="num">
           0
           <span>个</span>
         </span>
       </div>
       <div class="balance">
-        <span>我的红包</span>
+        <span>账户余额</span>
         <span class="num">
           0
           <span>个</span>
@@ -35,18 +35,53 @@
 </template>
 
 <script>
+import { mapState } from "vuex";
+import gql from "graphql-tag";
+import _ from "lodash";
+
 export default {
   data() {
-    return {};
+    return {
+      username: "请登录",
+      userId: "-1",
+      orderList: [],
+      discountNum: 0
+    };
   },
 
   components: {},
 
-  computed: {},
+  computed: {
+    ...mapState(["userInfo"])
+  },
+  apollo: {
+    //红包个数
+    // discountOne: gql`
+    //   {
+    //     discountOne(userId: 1) {
+    //       amount
+    //     }
+    //   }
+    // `
+  },
+  watch: {
+    // discountOne(val){
+    //   this.discountNum=val.amount
+    // }
+  },
 
-  mounted() {},
+  mounted() {
+    this.initData();
+  },
 
-  methods: {}
+  methods: {
+    initData() {
+      if (this.userInfo && this.userInfo.userId) {
+        this.username = this.userInfo.username;
+        this.userId = this.userInfo.userId;
+      }
+    }
+  }
 };
 </script>
 <style lang='scss' scoped>
@@ -71,6 +106,9 @@ export default {
       }
       .info {
         padding-left: 30px;
+        .name {
+          font-size: 18px;
+        }
         .des {
           margin: 6px 0 10px;
           color: #999;
@@ -101,6 +139,7 @@ export default {
       }
     }
     .red-envelope {
+      cursor: pointer;
       .num {
         color: #fc463f;
       }

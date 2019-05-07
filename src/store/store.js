@@ -8,10 +8,16 @@ Vue.use(Vuex);
 const state = {
     latitude: '', // 当前位置纬度
     longitude: '', // 当前位置经度
-    cartList: {}, // 加入购物车的商品列表
-    shopDetail: null, //商家详情信息
-    userInfo: null, //用户信息
-    shopid: null,//商铺id
+    cartList: [], // 加入购物车的商品列表
+    shopDetail: {
+      shopId:-1,
+      shopName:'shopAdmin'
+    }, //商家详情信息
+    // userInfo: null, //用户信息
+    userInfo: {
+      username:'admin',
+      userId:-1
+    }, //用户信息
     remarkText: null,//可选备注内容
     inputText: '',//输入备注内容
     invoice: false,//开发票
@@ -26,12 +32,13 @@ const state = {
     orderParam: null,//订单的参数
     orderMessage: null, //订单返回的信息
     orderDetail: null, //订单详情
-    login: true,//是否登录
+    isLogin: true,//是否登录
     imgPath:null,//头像地址
     removeAddress:[],//移除地址
     addAddress:'',		//新增地址
     question: null,//问题详情
     cartPrice: null, //会员卡价格
+
 };
 
 export default new Vuex.Store({

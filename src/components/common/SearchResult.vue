@@ -7,7 +7,7 @@
                 <li v-for="(item,index) in shopList" :key="index">
                     <!--商家信息-->
                     <div class="list-item">
-                        <div class="shop-title">
+                        <div class="shop-title" @click="toShop(item.id)">
                             <div class="shop-info">
                                 <div class="info-name">
                                     <span>{{item.name}}</span>
@@ -90,7 +90,7 @@
             }
         },
         computed:{
-            ...mapState(['latitude', 'longitude'])
+            ...mapState(['latitude', 'longitude','isLogin'])
         },
         props:['keyword'],
         mounted(){
@@ -115,7 +115,24 @@
 
             showAllFood(e){
                 $(e.target).parents('.food-more').hide().parents('.food-list').find('li.hide').show();
-            }
+            },
+
+            //跳转到商家页
+            toShop(shopId){
+              if(!this.isLogin){
+                this.$message({
+                  message: '请您先登录',
+                  type: 'warning'
+                });
+                return;
+              }
+              this.$router.push({
+                path:'/shop',
+                query:{
+                  shopId
+                }
+              })
+            },
         }
     }
 </script>
@@ -140,6 +157,7 @@
                             align-items: center;
                             padding: 10px;
                             border-bottom: 1px solid #f5f5f5;
+                            cursor: pointer;
                             .shop-info{
                                 display: flex;
                                 flex-direction: column;

@@ -2,11 +2,11 @@
   <div>
     <loading v-if="isLoading"></loading>
     <div v-else class="shop-wrap">
-      <div class="food-type">
+      <!-- <div class="food-type">
         <ul class="clear">
           <li v-for="(item, index) in menuList" :key="index">{{item.name}}</li>
         </ul>
-      </div>
+      </div> -->
       <div class="food-list">
         <ul class="clear">
           <li v-for="(item, index) in menuList" :key="index">
@@ -97,7 +97,7 @@
       </div>
       <!-- 购物车 -->
       <div class="cart">
-        <cart :resId="resId" :orderList="orderList"></cart>
+        <cart :resId="resId" :orderList="orderList" :deliveryFee="deliveryFee"></cart>
       </div>
     </div>
   </div>
@@ -122,7 +122,7 @@ export default {
       typeIndex:0,/* 默认选择第一个 */
     };
   },
-  props: ["resId"],
+  props: ["resId","deliveryFee"],
   computed: {
     a() {
       return 1;
@@ -139,15 +139,18 @@ export default {
   },
   mounted() {
     this.initData();
+    this.initCart();
   },
 
   methods: {
+    
     /**
      * 初始化数据
      */
     initData() {
+      let resId=this.resId
       getMenuByShopId({
-        resId: 1
+        resId
       }).then(res => {
         if (res.data.status == 1) {
           this.menuList = res.data.data;
@@ -155,6 +158,9 @@ export default {
           this.isLoading = false;
         }
       });
+    },
+    initCart(){
+
     },
     /**
      * 多种规格的食物返回价格最低的
@@ -360,6 +366,8 @@ export default {
     position: fixed;
     right: 0;
     bottom: 0;
+    z-index: 3
+    ;
   }
 }
 // 选规格弹出的弹窗

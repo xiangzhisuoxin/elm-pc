@@ -12,9 +12,10 @@
             <span class="header-icon"></span>
           </div>
           <div class="header-r">
-            <router-link to="/login/" tag="span" class="btn-reg">注册</router-link>|
-            <span class="btn-login">登录</span>|
-            <span class="btn-open">我要开店</span>
+            <router-link v-if="!isLogin" to="/login/" tag="span" class="btn-reg">登录</router-link>
+            <span v-else>{{username}}</span>
+            <!-- <span class="btn-login">登录</span>| -->
+            <!-- <span class="btn-open">我要开店</span> -->
           </div>
         </header>
         <main>
@@ -115,6 +116,8 @@ export default {
             cityGroup: {},
             inputAddress: '',
             detailLocationTimer: null,
+            username:'',
+            userId:0,
         }
     },
     components: {
@@ -123,6 +126,7 @@ export default {
     },
     mounted() {
         this.initData();
+        this.initState();
     },
     methods: {
         ...mapMutations(['RECORD_ADDRESS']),
@@ -135,12 +139,17 @@ export default {
 
             cityHot().then((res) => {
                 this.cityHot = res.data || this.cityHot;
-            })
+            });
 
             cityGroup().then((res) => {
                 this.cityGroup = res.data || this.cityGroup;
-            })
-
+            });
+        },
+        initState(){
+          if(this.isLogin){
+            this.username=this.userInfo.username;
+            this.userId=this.userInfo.userId;
+          }
         },
         //点击某一个城市
         cityListItemClick(cityId,cityName){
@@ -181,6 +190,7 @@ export default {
         }
     },
     computed: {
+      ...mapState(['userInfo','isLogin']),
         //将获取的数据按照A-Z字母开头排序
         sortgroupcity(){
             let sortobj = {};

@@ -1,9 +1,11 @@
 <template>
   <div class="user">
+    <my-header></my-header>
+    <div class="con">
     <header>
       <div class="header-l">
         当前位置:
-        <span class="position">1</span>
+        <span class="position"></span>
         <i class="el-icon-arrow-right"></i>
         <span class="current">我的收藏</span>
       </div>
@@ -42,18 +44,18 @@
         </div>
 
         <!-- 我的收藏 -->
-        <div class="side user-save">
+        <!-- <div class="side user-save">
           <div class="side-title">
             <i class="el-icon-star-on"></i>
             <h2>我的收藏</h2>
           </div>
-        </div>
+        </div> -->
       </aside>
 
       <!-- 右侧信息 -->
       <div class="main-r">
         <!-- 用户信息 -->
-        <userinfo></userinfo>
+        <userinfo :userId="userId"></userinfo>
 
         <!-- 订单详情 -->
         <history-order></history-order>
@@ -64,17 +66,21 @@
         <my-save></my-save>
       </div>
     </main>
+    </div>
   </div>
 </template>
 
 <script>
+import MyHeader from '../../components/Header/Header'
 import Userinfo from './children/Userinfo.vue'
 import HistoryOrder from './children/HistoryOrder.vue'
 import AddressManager from './children/AddressManager.vue'
 import MySave from './children/MySave.vue'
 export default {
   data() {
-    return {};
+    return {
+      userId:9
+    };
   },
 
   components: {
@@ -82,6 +88,7 @@ export default {
     HistoryOrder,
     AddressManager,
     MySave,
+    MyHeader
   },
 
   computed: {},
@@ -93,6 +100,8 @@ export default {
 </script>
 <style lang='scss' scoped>
 .user {
+  .con{
+
   padding: 0 20px;
   header {
     display: flex;
@@ -155,6 +164,7 @@ export default {
         padding: 20px 18px;
       }
     }
+  }
   }
 }
 </style>

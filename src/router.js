@@ -5,7 +5,8 @@ const Home = () => import('./views/Home/Home.vue')
 const Index = () => import('./views/Index/Index.vue')
 const Login = () => import('./views/Login/Login.vue');
 const Shop = () => import('./views/Shop/Shop.vue');
-const dev = () => import('./views/User/User.vue');
+const Checkout = () => import('./views/Checkout/Checkout.vue');
+const User = () => import('./views/User/User.vue');
 const Test = () => import('./components/Test');
 
 
@@ -18,8 +19,8 @@ export default new Router({
         {
             path: '/',
             name: 'home',
-            // component: Home
-            component: dev
+            component: Home
+            // component: dev
             // component: Shop
         },
         {
@@ -42,6 +43,16 @@ export default new Router({
             // this generates a separate chunk (about.[hash].js) for this route
             // which is lazy-loaded when the route is visited.
             component: () => import(/* webpackChunkName: "about" */ './views/About.vue')
+        },{
+            path:'/checkout',
+            component:Checkout
+        },
+        {
+            path:'/User',
+            component:User
+        },{
+            path:'/test',
+            component:Test
         }
     ]
 })
