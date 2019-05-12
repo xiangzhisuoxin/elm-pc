@@ -6,8 +6,8 @@
                 <img class="logo" src="../../assets/login-logo.svg" alt="">
             </div>
             <form action="">
-                <el-input class="account" v-model="username" placeholder="请输入账号"></el-input>
-                <el-input class="pwd" v-model="password" type="password" placeholder="请输入密码"></el-input>
+                <el-input class="account" v-model="username" placeholder="请输入账号" ></el-input>
+                <el-input class="pwd" v-model="password" type="password" placeholder="请输入密码" ></el-input>
                 <div class="verification">
                     <el-input class="code-input" v-model="verification" placeholder="请输入验证码"></el-input>
                     <img class="code-img" @click="getVerfication" :src="verificationCode" alt="">
@@ -28,8 +28,8 @@
     export default {
         data(){
             return{
-                username: '',
-                password:'',
+                username: 'xixi',
+                password:'123456',
                 verification: '',
                 verificationCode: '',
                 isLoading: false,
@@ -57,18 +57,22 @@
                         this.isLoading = false;
                         switch (res.data.status) {
                             case 0:
-                                alert('登录失败');
+                                this.$message.error('登录失败')
                                 break;
                             case 1:
-                                alert('登录成功');
-                                this.RECORD_USERINFO(res.data.data.userInfo);
+                                this.$message({
+                                  message: '登录成功',
+                                  type: 'success'
+                                });
+                                this.RECORD_USERINFO({userId:res.data.data.userInfo.user_id,username:
+                                res.data.data.userInfo.username});
                                 this.$router.go(-1);
                                 break;
                             case 2:
-                                alert('验证码错误');
+                                this.$message.error('验证码错误')
                                 break;
                             case 3:
-                                alert('密码错误');
+                                this.$message.error('密码错误')
                                 break;
                         }
                         break;
@@ -108,6 +112,7 @@
                 }
                 .verification{
                     @include fj();
+                  // display: none;
                     .code-input{
                         flex:4;
                     }

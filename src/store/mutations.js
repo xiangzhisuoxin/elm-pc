@@ -10,9 +10,9 @@ import { setStore } from "@/jsUtil/mUtils";
 
 export default {
     //记录用户信息
-    [RECORD_USERINFO](state, info) {
-        state.userInfo = info;
-        state.login = true;
+    [RECORD_USERINFO](state, {userId,username}) {
+        state.userInfo = {userId,username};
+        state.isLogin = true;
     },
     //记录地址
     [RECORD_ADDRESS](state,{
@@ -53,6 +53,7 @@ export default {
     //记录商家信息
     [RECORD_SHOPINFO](state,{shopId,shopName}){
         if(state.isLogin){
+            state.shopDetail={};
             state.shopDetail.shopId=shopId;
             state.shopDetail.shopName=shopName;
         }

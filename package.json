@@ -20,6 +20,7 @@
     "vue-apollo": "^3.0.0-beta.28",
     "vue-router": "^3.0.1",
     "vuex": "^3.0.1",
+    "vuex-along": "1.1.5",
     "watchpack": "^1.6.0"
   },
   "devDependencies": {

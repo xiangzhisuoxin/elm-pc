@@ -55,6 +55,7 @@ export default {
       isNewAddress: false,
       addressList: undefined,
       addressOne: [],
+      
       addressInfo: {
         name: "",
         sex: "",

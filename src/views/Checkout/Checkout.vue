@@ -65,11 +65,12 @@
                 v-for="(item, index) in addressOne.slice(0,3)"
                 :key="index"
                 :class="{'address-list-active':index == 0}"
+                @click="clickAddress($event)"
               >
                 <i class="el-icon-location-outline"></i>
                 <div class="detail">
                   <span class="person">{{`${item.name} ${item.sex==1?'先生':'女士'} ${item.phone}`}}</span>
-                  <span class="addr">{{`${item.address} ${item.address_detail}`}}</span>
+                  <span class="addr">{{`${item.address} ${item.address_detail||''}`}}</span>
                 </div>
               </li>
             </ul>
@@ -123,6 +124,8 @@
 <script>
 import { mapState } from "vuex";
 import gql from "graphql-tag";
+import { clickUtil } from '../../jsUtil/mUtils';
+import dayjs from 'dayjs';
 export default {
   data() {
     return {
@@ -194,7 +197,7 @@ export default {
       //做的很粗糙 不知道怎么写 json转字符串 怎么去掉key的"?
       let cartText=[]
       cart.forEach((item => {
-        let text = `{name:"${item.name}"},{quantity:${item.quantity}},{price:${item.price}}`;
+        let text = `{name:"${item.name}",quantity:${item.quantity},price:${item.price}}`;
         cartText.push(text);
       }));
       cartText=`[${cartText.join(',')}]`;
@@ -204,9 +207,9 @@ export default {
                         shopName:"${this.shopDetail.shopName}",
                         userId:${this.userInfo.userId},
                         addressId:${this.addressId},
-                        orderTime:"${new Date().getTime()}",
+                        orderTime:"${dayjs().format('YYYY-MM-DD HH:mm')}",
                         deliveryFee:{price:${this.deliveryFee}},
-                        totalCost:10,
+                        totalCost:${this.totalCost},
                         cart:${cartText}
                       ){
 
@@ -225,6 +228,13 @@ export default {
         }, 3000);
       }).catch(() => {
         this.$message.error("下单失败");
+      })
+    },
+
+    clickAddress(e){
+      clickUtil({
+        el:e.target,
+        activeClass:'address-list-active'
       })
     }
   }

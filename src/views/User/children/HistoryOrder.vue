@@ -3,11 +3,11 @@
   <section class="order">
     <div class="order-top">
       <span class="latest">最近订单</span>
-      <span class="all-list">查看所有订单</span>
+      <span class="all-list" @click="pageSize=orderList.length;isShowAll=true;" v-if="!isShowAll">查看所有订单</span>
     </div>
     <div class="order-list">
       <ul v-if="orderList">
-        <li v-for="(item, index) in orderList" :key="index">
+        <li v-for="(item, index) in orderList.slice(0,pageSize)" :key="index">
           <img class="res-picture" src="../../../assets/shop.webp" alt>
           <div class="order-info">
             <span class="order-name">{{item.restaurant_name}}</span>
@@ -31,8 +31,11 @@ import _ from "lodash";
 export default {
   data() {
     return {
-      userId: -1,
-      orderList: undefined
+      userId: -999,
+      orderList: undefined,
+      pageSize:3,
+      isShowAll:false,
+      orderOne:[],
     };
   },
 
@@ -42,9 +45,36 @@ export default {
     ...mapState(["userInfo"])
   },
 
-  apollo: {
-    orderOne() {
-      return gql`{
+  watch: {
+    orderOne(val) {
+      // this.orderList = _.flatten(val.order.basket.group);
+      this.orderList = val;
+    }
+  },
+
+  mounted() {
+    this.initData();
+  },
+
+  methods: {
+    initData() {
+      if (this.userInfo) {
+        this.userId = this.userInfo.userId;
+      }
+
+      this.getOrderList(this.pageSize);
+    },
+    parseBasket(arr=[]) {
+      let text = [];
+      if (arr&&arr.length) {
+        text = _.map(arr, item => {
+          return item.name + "*" + item.quantity;
+        });
+      }
+      return text.join(",");
+    },
+    getOrderList(){
+      let query=gql`{
           orderOne(userId: ${this.userId}) {
             restaurant_name
             formatted_created_at
@@ -69,33 +99,12 @@ export default {
           }
         }
       `;
-    }
-  },
-  watch: {
-    orderOne(val) {
-      // this.orderList = _.flatten(val.order.basket.group);
-      this.orderList = val;
-    }
-  },
 
-  mounted() {
-    this.initData();
-  },
-
-  methods: {
-    initData() {
-      if (this.userInfo) {
-        this.userId = this.userInfo.userId;
-      }
-    },
-    parseBasket(arr=[]) {
-      let text = [];
-      if (arr&&arr.length) {
-        text = _.map(arr, item => {
-          return item.name + "*" + item.quantity;
-        });
-      }
-      return text.join(",");
+      this.$apollo.query({
+        query
+      }).then(res => {
+        this.orderOne = res.data.orderOne;
+      })
     }
   }
 };

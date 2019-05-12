@@ -31,7 +31,7 @@
               <el-submenu index="2">
                 <template slot="title">{{username}}</template>
                 <router-link tag="el-menu-item" :to="{path:'/user'}" index="2-1"> 个人中心</router-link>
-                <el-menu-item index="2-3" @click="QUIT_LOGIN()">退出登录</el-menu-item>
+                <el-menu-item index="2-3" @click="quit">退出登录</el-menu-item>
               </el-submenu>
             </el-menu>
           </div>
@@ -77,9 +77,17 @@ export default {
           this.$router.push({path:'/index',query:{latitude:this.latitude,longitude:this.longitude}})
         break;
         case 2:
+          if(!this.isLogin){
+            this.$message.error('请登录');
+            return;
+          }
           this.$router.push('/user')
         break;
       }
+    },
+    quit(){
+      this.QUIT_LOGIN();
+      this.$router.push('/index');
     }
   }
 };

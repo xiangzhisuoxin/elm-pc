@@ -70,10 +70,13 @@
         </el-popover>
       </li>
     </ul>
-    <div class="more-login" v-if="!isLogin">
+    <router-link tag="div" 
+    :to="{path:'/login'}"
+    class="more-login" 
+    v-if="!isLogin">
       查看更多商家，请先
       <span class="highlight">登录</span>
-    </div>
+    </router-link>
   </div>
 </template>
 
