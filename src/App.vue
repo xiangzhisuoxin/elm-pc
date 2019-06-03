@@ -17,6 +17,7 @@
   /*text-align: center;*/
   /*color: #2c3e50;*/
   @include wh;
+  min-width: 1350px;
 }
 #nav {
   padding: 30px;
