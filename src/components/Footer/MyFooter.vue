@@ -15,8 +15,9 @@
                 </div>
             </div>
             <div class="company-info" v-if="isShowCompanyInfo">
-                <span class="owner">所有方：上海拉扎斯信息科技有限公司</span>
-                <span class="copyright">增值电信业务许可证 :沪B2-20150033|沪ICP备 09007032|上海工商行政管理 Copyright ©2008-2017 ele.me, All Rights Reserved.</span>
+                <!-- <span class="owner">所有方：上海拉扎斯信息科技有限公司</span> -->
+                <span class="copyright">备案号:</span>
+                <a href="http://www.beian.miit.gov.cn">冀ICP备19020165号</a>
                 <img class="num" src="../../assets/footer-num.jpg"/>
             </div>
         </footer>
