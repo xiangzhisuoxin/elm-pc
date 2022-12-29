@@ -25,12 +25,12 @@
     "watchpack": "^1.6.0"
   },
   "devDependencies": {
-    "@vue/cli-plugin-babel": "^3.0.4",
-    "@vue/cli-service": "^3.0.4",
+    "@vue/cli-plugin-babel": "^3.12.1",
+    "@vue/cli-service": "^5.0.8",
     "less": "^3.0.4",
-    "less-loader": "^4.1.0",
+    "less-loader": "^11.1.0",
     "node-sass": "^4.10.0",
-    "sass-loader": "^7.1.0",
+    "sass-loader": "^13.2.0",
     "vue-template-compiler": "^2.5.17"
   },
   "postcss": {
